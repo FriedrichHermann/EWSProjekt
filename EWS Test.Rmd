@@ -7,23 +7,20 @@ output: pdf_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
+1. Dataset aufrufen und ersten Eindruck der Daten bekommen
+```{r}
+df_1 <-read.csv("https://raw.githubusercontent.com/FriedrichHermann/EWSProjekt/main/cardio_train.csv", sep=";")
+df_1$age <- df_1$age/365
+df_1$height <- df_1$height/100
+head(df_1)
+```
+2. Als nächstes Versuchen wir den Datensatz "aufzuräumen" indem wir nach fehlenden Werten suchen und die entsprechend des Kontextes eliminieren oder ersetzen mit einem sinnvollen Eintrag
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
+```{r}
+which(is.na(df_1)) #which gibt den Index mit dem Missing value an
+length(unique(df_1$id)) == nrow(df_1) #schauen ob die Anzahl der einmaligen Id's gleich der Anzahl der Zeilen ist
 ```
 
-## Including Plots
+-> es gibt keine fehlenden Einträge
+-> es gibt keine doppelten Einträge
 
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-jahajhajhjsjhhh
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
