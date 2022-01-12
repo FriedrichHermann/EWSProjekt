@@ -5,13 +5,24 @@ output: pdf_document
 
 ##Struktur des Projekts
 1. Einleitung: In der Einleitung solltet ihr eure allgemeine Forschungsfrage und eure Daten vorstellen (woher sie stammen, wie sie erhoben wurden, um welche Fälle es sich handelt, welche Variablen enthalten sind, usw.)
+Forschungsfrage:
+
+- Einfluss vom Lebensstil auf Herz-Kreislauf Krankheiten
+- Welche Art von Mensch betrachten wir? 
+      Median sowie Extremwerte
+      Ist das Sample representativ für die Gesamtbevölkerung?
+- Variablen die wir inkludieren: Age, Gender, Weight, height, brauchen Variable für schlechten/ guten Lebensstil, schlechte/ Gute Gesundheit
+    - erster Schritt Gruppierung zwischen gute und schlechte Gesundheit anhand BMI(Gender, Age, Gewicht) und Blutdruck
+    - zweiter Schritt nähere Untersuchung der diskreten Variablen in den definierten Gruppen
 
 2. Explorative Datenanalyse: Erstellt eine Beschreibung des Datensatzes, die sowohl numerische Zusammenfassungen (deskriptive Statistiken) als auch entsprechende Grafiken enthält. Konzentriert euch bei größeren Datensätzen auf die Variablen, die ihr in Abschnitt 4 genauer analysiert.
+
+
+
 
 3. Methoden: Beschreibt kurz die von euch verwendete(n) statistischen Methode(n). Gebt Referenzen auf entsprechende Literatur für eine detaillierte Beschreibung.
 
 4. Ergebnisse und Schlussfolgerungen: Identifiziert eine interessante abhängige Variable Y und mindestens eine Einflussvariable X. Die Variable X kann entweder kategoriell sein und für den Vergleich von zwei (oder mehr) Gruppen stehen oder metrisch. Im zweiten Fall wird man dann an einer Beschreibung des linearen Zusammenhangs zwischen X und Y interessiert sein. Wendet, die in Abschnitt 3 beschriebenen Methoden passend an und berichtet die Ergebnisse, die nötig sind um eure Forschungsfrage zu beantworten und zieht entsprechende Schlussfolgerungen.
-
 
 
 1. Dataset aufrufen und ersten Eindruck der Daten bekommen
