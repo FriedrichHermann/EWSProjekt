@@ -1,0 +1,32 @@
+---
+title: "1 Schritt"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+1 Schritt: Korrelationen zwischen kardiovasculären Erkrankungen und dem kardiovasculären Wohlbefinden. 
+
+Wir messen das kardiovaskuläre Wohlbefinden anhand von zweien - von uns neudefinierten - Variablen. Einerseits der BMI (Body-Mass-Index), welcher als BMI = (weight)/(height)^2 definiert wird. 
+
+Andereseits die Variable highBP (high blood pressure), die alle Patienten beinhaltet, für die entweder ap_hi >= 130, oder ap_lo >= 80 zutrifft. Dabei basieren wir uns auf die Definition vom Bluthochdruch der "American Heart  Association". 
+
+
+
+```{r}
+library('tidyverse')
+df_1 <-read.csv("cardio_train.csv", sep=";")
+df_1$age <- df_1$age/365
+df_1$height <- df_1$height/100
+df_1 <- cbind(df_1 , "BMI" = (df_1$weight)/(df_1$height)^2 )
+
+df_1 <- filter(df_1, ap_lo < 150,ap_lo > 30,  BMI < 100)
+ggplot(df_1 , aes(ap_lo,BMI)) + geom_jitter(aes(colour = cardio))
+
+
+
+
+```
+
