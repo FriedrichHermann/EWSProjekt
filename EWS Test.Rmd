@@ -16,7 +16,7 @@ output: pdf_document
 
 1. Dataset aufrufen und ersten Eindruck der Daten bekommen
 ```{r}
-df_1 <-read.csv("https://raw.githubusercontent.com/FriedrichHermann/EWSProjekt/main/cardio_train.csv", sep=";")
+df_1 <-read.csv("https://raw.githubusercontent.com/FriedrichHermann/EWSProjekt/main/cardio_train.csv?token=GHSAT0AAAAAABQLITL37YB347TRW5TILKDEYO67Y6Q", sep=";")
 df_1$age <- df_1$age/365
 df_1$height <- df_1$height/100
 head(df_1)
@@ -31,3 +31,4 @@ length(unique(df_1$id)) == nrow(df_1) #schauen ob die Anzahl der einmaligen Id's
 -> es gibt keine fehlenden Einträge
 -> es gibt keine doppelten Einträge
 
+jhjhjhj
