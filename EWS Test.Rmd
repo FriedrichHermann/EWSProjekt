@@ -16,10 +16,11 @@ output: pdf_document
 
 1. Dataset aufrufen und ersten Eindruck der Daten bekommen
 ```{r}
-df_1 <-read.csv("https://raw.githubusercontent.com/FriedrichHermann/EWSProjekt/main/cardio_train.csv?token=GHSAT0AAAAAABQLITL37YB347TRW5TILKDEYO67Y6Q", sep=";")
+df_1 <-read.csv("cardio_train.csv", sep=";")
 df_1$age <- df_1$age/365
 df_1$height <- df_1$height/100
 head(df_1)
+
 ```
 2. Als nächstes Versuchen wir den Datensatz "aufzuräumen" indem wir nach fehlenden Werten suchen und die entsprechend des Kontextes eliminieren oder ersetzen mit einem sinnvollen Eintrag
 
