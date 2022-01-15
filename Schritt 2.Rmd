@@ -1,0 +1,40 @@
+---
+title: "Schritt 2"
+output: html_document
+---
+```{r}
+df_1 <-read.csv("cardio_train.csv", sep=";")
+df_1$age <- df_1$age/365
+df_1$height <- df_1$height/100
+df_1 <- cbind(df_1 , "BMI" = (df_1$weight)/(df_1$height)^2 )
+head(df_1)
+nrow(df_1)
+```
+
+Schritt 2 - Untersuchen der Gruppierungen
+
+
+
+Gruppe 1 (Gute Gesundheit) 
+- BMI 18 bis 25
+ap_lo <80
+ap_hi <130
+
+
+Gruppe 2 (Übergewicht/ Untergewicht und Bluthochdruck):
+- BMI >25
+- ap_lo >80
+- ap_hi >130
+
+```{r}
+library(dplyr)
+df_gut<-df_1 %>% filter(BMI >= 18) %>% filter(BMI <= 25) %>% filter(ap_lo<=80) %>%filter(ap_hi<=130)
+df_schlecht_1<-df_1 %>% filter(BMI < 18, ap_lo > 80, ap_hi > 130)
+df_schlecht_2<-df_1 %>% filter(BMI > 25, ap_lo > 80, ap_hi > 130)
+df_schlecht <- rbind(df_schlecht_1,df_schlecht_2)
+nrow(df_schlecht)+nrow(df_gut)
+
+```
+
+!! fast 4000 weniger Datenpunkte. Evtl macht es hier also sinn die Blutdruck werte aussenvor zu lassen?
+TB Discussed
