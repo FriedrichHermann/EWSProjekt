@@ -9,9 +9,17 @@ knitr::opts_chunk$set(echo = TRUE)
 
 1 Schritt: Korrelationen zwischen kardiovasculären Erkrankungen und dem kardiovasculären Wohlbefinden. 
 
-Wir messen das kardiovaskuläre Wohlbefinden anhand von zweien - von uns neudefinierten - Variablen. Einerseits der BMI (Body-Mass-Index), welcher als BMI = (weight)/(height)^2 definiert wird. 
+Wir führen ein:
 
-Andereseits die Variable highBP (high blood pressure), die alle Patienten beinhaltet, für die entweder ap_hi >= 130, oder ap_lo >= 80 zutrifft. Dabei basieren wir uns auf die Definition vom Bluthochdruch der "American Heart  Association". 
+BMI (Body-Mass-Index): ist definiert als BMI = (weight)/(height)^2 
+
+"guter Blutdruck" : ap_hi < 139 und ap_lo < 89
+"schlechter Blutdruck": ap_hi > 140 oder ap_lo > 90 dabei basieren wir uns auf die "American Heart Association"
+
+
+
+
+
 
 
 
@@ -21,21 +29,20 @@ library('tidyverse')
 df_1 <-read.csv("cardio_train.csv", sep=";")
 df_1$age <- df_1$age/365
 df_1$height <- df_1$height/100
-df_1 <- cbind(df_1 , "BMI" = (df_1$weight)/(df_1$height)^2 )
+df_1 <- cbind(df_1 , "BMI" = (df_1$weight)/(df_1$height)^2 ) #hier habe ich den BMI eingefügt 
 
-df_1 <- filter(df_1, ap_lo < 250,ap_lo > 20, ap_hi < 250,ap_hi > 20, BMI < 100)
+df_1 <- filter(df_1, ap_lo < 250,ap_lo > 20, ap_hi < 250,ap_hi > 20, BMI < 100) #hier habe ich die Patienten rausgefiltert, die für die Analyse entweder zu hohe/zu niedrige Blutdruckwerte haben
 
 p <- ggplot(df_1, aes(x = ap_lo , y = ap_hi )) + geom_point(aes(color = ifelse(cardio == 0 , 'green' ,'red'))) + scale_colour_manual(labels = c("0","1"), values = c('green','red')) +
- labs(color = "cardio") + coord_fixed()
+ labs(color = "cardio")
+
+p + geom_segment(aes(x = 20, y = 139 , xend = 89 ,yend = 139)) + geom_segment(aes(x = 89, y = 20 , xend = 89 ,yend = 139)) + geom_segment(aes(x = 20, y = 20 , xend = 89 ,yend = 20)) + geom_segment(aes(x = 20, y = 20 , xend = 20 ,yend = 139))  #hier habe ich zwei Segmente im Plot eingezeichnet, um die Gruppe mit niedrigem Blutdruck von der Gruppe mit hohem Blutdruck im zu unterscheiden. 
 
 
-df_c1 <- filter(df_1,cardio == 1)
-
-c1x <- sum(c(df_c1$ap_lo))/length(c(df_c1$ap_lo))
-c1y <- sum(c(df_c1$ap_hi))/length(c(df_c1$ap_hi))
-
-p
 
 ```
 
+Innerhalb des Quadrats befindet sich die Gruppe an Patienten, die gute Blutdruckwerte haben (siehe Definition) und außerhalb des Quadrats solche, die schlechte Blutdruckwerte haben.
 
+
+Am Plot erkennt man, dass sich im Quadrat mehr grüne als rote, und außerhalb deutlich mehr rote als grüne befinden. 
