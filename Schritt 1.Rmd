@@ -46,3 +46,5 @@ Innerhalb des Quadrats befindet sich die Gruppe an Patienten, die gute Blutdruck
 
 
 Am Plot erkennt man, dass sich im Quadrat mehr grüne als rote, und außerhalb deutlich mehr rote als grüne befinden. 
+
+das muss ich noch Ergänzen
