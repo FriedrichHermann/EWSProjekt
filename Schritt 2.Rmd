@@ -23,6 +23,7 @@ ap_hi <130
 
 Gruppe 2 (Übergewicht/ Untergewicht und Bluthochdruck):
 - BMI >25
+- BMI <18
 - ap_lo >80
 - ap_hi >130
 
@@ -32,9 +33,12 @@ df_gut<-df_1 %>% filter(BMI >= 18) %>% filter(BMI <= 25) %>% filter(ap_lo<=80) %
 df_schlecht_1<-df_1 %>% filter(BMI < 18, ap_lo > 80, ap_hi > 130)
 df_schlecht_2<-df_1 %>% filter(BMI > 25, ap_lo > 80, ap_hi > 130)
 df_schlecht <- rbind(df_schlecht_1,df_schlecht_2)
-nrow(df_schlecht)+nrow(df_gut)
+nrow(df_schlecht)
+nrow(df_gut)
 
 ```
 
 !! fast 4000 weniger Datenpunkte. Evtl macht es hier also sinn die Blutdruck werte aussenvor zu lassen?
 TB Discussed
+
+- Cholesterol und Glucose nicht weiter da das "Essensangewohnheiten"
