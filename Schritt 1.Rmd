@@ -23,7 +23,7 @@ df_1$age <- df_1$age/365
 df_1$height <- df_1$height/100
 df_1 <- cbind(df_1 , "BMI" = (df_1$weight)/(df_1$height)^2 )
 
-df_1 <- filter(df_1, ap_lo < 200,ap_lo > 50, ap_hi < 200,ap_hi > 50, BMI < 100)
+df_1 <- filter(df_1, ap_lo < 250,ap_lo > 20, ap_hi < 250,ap_hi > 20, BMI < 100)
 
 p <- ggplot(df_1, aes(x = ap_lo , y = ap_hi )) + geom_point(aes(color = ifelse(cardio == 0 , 'green' ,'red'))) + scale_colour_manual(labels = c("0","1"), values = c('green','red')) +
  labs(color = "cardio") + coord_fixed()
