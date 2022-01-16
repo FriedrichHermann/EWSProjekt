@@ -13,8 +13,8 @@ Wir führen ein:
 
 BMI (Body-Mass-Index): ist definiert als BMI = (weight)/(height)^2 
 
-"guter Blutdruck" : ap_hi < 139 und ap_lo < 89
-"schlechter Blutdruck": ap_hi > 140 oder ap_lo > 90 dabei basieren wir uns auf die "American Heart Association"
+"guter Blutdruck" : ap_hi <= 139 und ap_lo <= 89
+"schlechter Blutdruck": ap_hi >= 140 oder ap_lo >= 90 dabei basieren wir uns auf der schweizerischen Herzstiftung.
 
 
 

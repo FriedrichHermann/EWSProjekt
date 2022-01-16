@@ -29,9 +29,9 @@ Gruppe 2 (Übergewicht/ Untergewicht und Bluthochdruck):
 
 ```{r}
 library(dplyr)
-df_gut<-df_1 %>% filter(BMI >= 18) %>% filter(BMI <= 25) %>% filter(ap_lo<=80) %>%filter(ap_hi<=130)
-df_schlecht_1<-df_1 %>% filter(BMI < 18, ap_lo > 80, ap_hi > 130)
-df_schlecht_2<-df_1 %>% filter(BMI > 25, ap_lo > 80, ap_hi > 130)
+df_gut<-df_1 %>% filter(BMI >= 18) %>% filter(BMI <= 25) %>% filter(ap_lo<=89) %>%filter(ap_hi<=139)
+df_schlecht_1<-df_1 %>% filter(BMI < 18, ap_lo > 89, ap_hi > 139)
+df_schlecht_2<-df_1 %>% filter(BMI > 25, ap_lo > 89, ap_hi > 139)
 df_schlecht <- rbind(df_schlecht_1,df_schlecht_2)
 nrow(df_schlecht)
 nrow(df_gut)
@@ -42,3 +42,42 @@ nrow(df_gut)
 TB Discussed
 
 - Cholesterol und Glucose nicht weiter da das "Essensangewohnheiten"
+
+
+
+Schritt 2: Untersuchen der einzelnen Gruppen und aufzeigen verschiedener Korrelationen innerhalb der Gruppe
+
+Kategorie 1: Ernährung
+- Betrachtete Variablen:
+1. Cholesterol
+2. Glucose
+
+```{r}
+library(gridExtra)
+#Glucose gesund
+df_gluc1 <- data.frame(c(1,2,3),c(nrow(filter(df_gut,gluc == 1))/nrow(df_gut),nrow(filter(df_gut,gluc == 2))/nrow(df_gut),nrow(filter(df_gut,gluc == 3))/nrow(df_gut)))
+colnames(df_gluc1) <- c("Glucose","Ratio")
+
+#Cholesterol gesund
+df_chol1 <- data.frame(c(1,2,3),c(nrow(filter(df_gut,cholesterol == 1))/nrow(df_gut),nrow(filter(df_gut,cholesterol == 2))/nrow(df_gut),nrow(filter(df_gut,cholesterol == 3))/nrow(df_gut)))
+colnames(df_chol1) <- c("Cholesterol","Ratio")
+
+#Glucose ungesund
+df_gluc2 <- data.frame(c(1,2,3),c(nrow(filter(df_schlecht,gluc == 1))/nrow(df_schlecht),nrow(filter(df_schlecht,gluc == 2))/nrow(df_schlecht),nrow(filter(df_schlecht,gluc == 3))/nrow(df_schlecht)))
+colnames(df_gluc2) <- c("Glucose","Ratio")
+
+#Cholesterol ungesund
+df_chol2 <- data.frame(c(1,2,3),c(nrow(filter(df_schlecht,cholesterol == 1))/nrow(df_schlecht),nrow(filter(df_schlecht,cholesterol == 2))/nrow(df_schlecht),nrow(filter(df_schlecht,cholesterol == 3))/nrow(df_schlecht)))
+colnames(df_chol2) <- c("Cholesterol","Ratio")
+
+
+
+
+plt1<-ggplot(df_gluc1, aes(x=Glucose, y=Ratio))  + geom_bar(stat = "identity") + ggtitle("Glucose Level bei guter Gesundheit")
+plt2<-ggplot(df_chol1, aes(x=Cholesterol, y=Ratio))  + geom_bar(stat = "identity") + ggtitle("Cholesterol Level bei guter Gesundheit")
+plt3<-ggplot(df_gluc2, aes(x=Glucose, y=Ratio))  + geom_bar(stat = "identity") + ggtitle("Glucose Level bei schlechter Gesundheit")
+plt4<-ggplot(df_chol2, aes(x=Cholesterol, y=Ratio))  + geom_bar(stat = "identity") + ggtitle("Cholesterol Level bei schlechter Gesundheit")
+grid.arrange(plt1,plt2,plt3,plt4, ncol=2)
+?grid.arrange
+```
+
