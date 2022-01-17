@@ -3,6 +3,12 @@ title: "Schritt 2"
 output: html_document
 ---
 ```{r}
+library(dplyr)
+library(ggplot2)
+library(gridExtra)
+```
+
+```{r}
 df_1 <-read.csv("cardio_train.csv", sep=";")
 df_1$age <- df_1$age/365
 df_1$height <- df_1$height/100
@@ -28,7 +34,6 @@ Gruppe 2 (Übergewicht/ Untergewicht und Bluthochdruck):
 - ap_hi >130
 
 ```{r}
-library(dplyr)
 df_gut<-df_1 %>% filter(BMI >= 18) %>% filter(BMI <= 25) %>% filter(ap_lo<=89) %>%filter(ap_hi<=139)
 df_schlecht_1<-df_1 %>% filter(BMI < 18, ap_lo > 89, ap_hi > 139)
 df_schlecht_2<-df_1 %>% filter(BMI > 25, ap_lo > 89, ap_hi > 139)
@@ -53,7 +58,6 @@ Kategorie 1: Ernährung
 2. Glucose
 
 ```{r}
-library(gridExtra)
 #Glucose gesund
 df_gluc1 <- data.frame(c(1,2,3),c(nrow(filter(df_gut,gluc == 1))/nrow(df_gut),nrow(filter(df_gut,gluc == 2))/nrow(df_gut),nrow(filter(df_gut,gluc == 3))/nrow(df_gut)))
 colnames(df_gluc1) <- c("Glucose","Ratio")
@@ -78,6 +82,56 @@ plt2<-ggplot(df_chol1, aes(x=Cholesterol, y=Ratio))  + geom_bar(stat = "identity
 plt3<-ggplot(df_gluc2, aes(x=Glucose, y=Ratio))  + geom_bar(stat = "identity") + ggtitle("Glucose Level bei schlechter Gesundheit")
 plt4<-ggplot(df_chol2, aes(x=Cholesterol, y=Ratio))  + geom_bar(stat = "identity") + ggtitle("Cholesterol Level bei schlechter Gesundheit")
 grid.arrange(plt1,plt2,plt3,plt4, ncol=2)
-?grid.arrange
+```
+Kategorie 2: Drogenkonsum
+- Betrachtete Variablen:
+1. alco
+2. smoke
+
+```{r}
+#Alkohol gesund
+df_alc1 <- data.frame(c(0,1),c(nrow(filter(df_gut,alco == 0))/nrow(df_gut),nrow(filter(df_gut,alco == 1))/nrow(df_gut)))
+colnames(df_alc1) <- c("Alkohol","Ratio")
+
+#Rauchen gesund
+df_smoke1 <- data.frame(c(0,1),c(nrow(filter(df_gut,smoke == 0))/nrow(df_gut),nrow(filter(df_gut,smoke == 1))/nrow(df_gut)))
+colnames(df_smoke1) <- c("Rauchen","Ratio")
+
+#Alkohol ungesund
+df_alc2 <- data.frame(c(0,1),c(nrow(filter(df_schlecht,alco == 0))/nrow(df_schlecht),nrow(filter(df_schlecht,alco == 1))/nrow(df_schlecht)))
+colnames(df_alc2) <- c("Alkohol","Ratio")
+
+#Rauchen ungesund
+df_smoke2 <- data.frame(c(0,1),c(nrow(filter(df_schlecht,smoke == 0))/nrow(df_schlecht),nrow(filter(df_schlecht,smoke == 1))/nrow(df_schlecht)))
+colnames(df_smoke2) <- c("Rauchen","Ratio")
+
+
+
+
+plt5<-ggplot(df_alc1, aes(x=Alkohol, y=Ratio))  + geom_bar(stat = "identity") + ggtitle("Alkoholkonsumenten bei guter Gesundheit")
+plt6<-ggplot(df_smoke1, aes(x=Rauchen, y=Ratio))  + geom_bar(stat = "identity") + ggtitle("Raucher bei guter Gesundheit")
+plt7<-ggplot(df_alc2, aes(x=Alkohol, y=Ratio))  + geom_bar(stat = "identity") + ggtitle("Alkoholkonsumenten bei schlechter Gesundheit")
+plt8<-ggplot(df_smoke2, aes(x=Rauchen, y=Ratio))  + geom_bar(stat = "identity") + ggtitle("Raucher bei schlechter Gesundheit")
+grid.arrange(plt5,plt6,plt7,plt8, ncol=2)
+```
+Kategorie 3: Sportliche Betätigung
+- Betrachtete Variablen:
+1. active
+
+```{r}
+#Sport gesund
+df_act1 <- data.frame(c(0,1),c(nrow(filter(df_gut,active == 0))/nrow(df_gut),nrow(filter(df_gut,active == 1))/nrow(df_gut)))
+colnames(df_act1) <- c("Sport","Ratio")
+
+#Sport ungesund
+df_act2 <- data.frame(c(0,1),c(nrow(filter(df_schlecht,active == 0))/nrow(df_schlecht),nrow(filter(df_schlecht,active == 1))/nrow(df_schlecht)))
+colnames(df_act2) <- c("Sport","Ratio")
+
+
+plt9<-ggplot(df_act1, aes(x=Sport, y=Ratio))  + geom_bar(stat = "identity") + ggtitle("Körperliche Betätigung bei guter Gesundheit")
+
+plt10<-ggplot(df_act2, aes(x=Sport, y=Ratio))  + geom_bar(stat = "identity") + ggtitle("Körperliche Betätigung bei schlechter Gesundheit")
+
+grid.arrange(plt9,plt10, ncol=2)
 ```
 
