@@ -34,9 +34,9 @@ df_1 <- cbind(df_1 , "BMI" = (df_1$weight)/(df_1$height)^2 ) #hier habe ich den 
 df_1 <- filter(df_1, ap_lo < 250,ap_lo > 20, ap_hi < 250,ap_hi > 20, BMI < 100) #hier habe ich die Patienten rausgefiltert, die für die Analyse entweder zu hohe/zu niedrige Blutdruckwerte haben
 
 p <- ggplot(df_1, aes(x = ap_lo , y = ap_hi )) + geom_point(aes(color = ifelse(cardio == 0 , 'green' ,'red'))) + scale_colour_manual(labels = c("0","1"), values = c('green','red')) +
- labs(color = "cardio")
+ labs(color = "Krankheit")
 
-p + geom_segment(aes(x = 20, y = 139 , xend = 89 ,yend = 139)) + geom_segment(aes(x = 89, y = 20 , xend = 89 ,yend = 139)) + geom_segment(aes(x = 20, y = 20 , xend = 89 ,yend = 20)) + geom_segment(aes(x = 20, y = 20 , xend = 20 ,yend = 139))  #hier habe ich zwei Segmente im Plot eingezeichnet, um die Gruppe mit niedrigem Blutdruck von der Gruppe mit hohem Blutdruck im zu unterscheiden. 
+p + geom_segment(aes(x = 20, y = 139 , xend = 89 ,yend = 139)) + geom_segment(aes(x = 89, y = 20 , xend = 89 ,yend = 139)) + geom_segment(aes(x = 20, y = 20 , xend = 89 ,yend = 20)) + geom_segment(aes(x = 20, y = 20 , xend = 20 ,yend = 139)) + labs(title = "Blutdruck-Profil der Patienten") #hier habe ich zwei Segmente im Plot eingezeichnet, um die Gruppe mit niedrigem Blutdruck von der Gruppe mit hohem Blutdruck im zu unterscheiden. 
 
 
 
@@ -48,3 +48,28 @@ Innerhalb des Quadrats befindet sich die Gruppe an Patienten, die gute Blutdruck
 Am Plot erkennt man, dass sich im Quadrat mehr grüne als rote, und außerhalb deutlich mehr rote als grüne befinden. 
 
 das muss ich noch Ergänzen
+```{r}
+
+p <- ggplot(df_1, aes(cardio,BMI)) + geom_boxplot(aes(color = ifelse(cardio == 0 , 'green' ,'red'))) + scale_colour_manual(labels = c("0","1"), values = c('green','red')) + labs(color = 'Krankheit', title = 'BMI-Profil der Patienten') + theme( aspect.ratio = 1.5) 
+p 
+
+```
+```{r}
+
+df_krank <- filter(df_1 , cardio == 1)
+df_gesund <- filter(df_1 ,cardio == 0)
+
+summary(df_gesund$BMI)
+```
+```{r}
+summary(df_krank$BMI)
+```
+
+Man sieht anhand des Plot und der Tabellen, dass die kranken Patienten einen leicht höheren BMI vorweisen, als die gesunden. Entsprechend 26.483 und 28.473 im Mittel. Ab einem BMI von 
+
+
+
+
+
+
+
