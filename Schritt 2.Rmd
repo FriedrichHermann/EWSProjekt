@@ -40,6 +40,7 @@ df_schlecht_2<-df_1 %>% filter(BMI > 25, ap_lo > 89, ap_hi > 139)
 df_schlecht <- rbind(df_schlecht_1,df_schlecht_2)
 nrow(df_schlecht)
 nrow(df_gut)
+head(df_gut)
 
 ```
 
@@ -134,4 +135,26 @@ plt10<-ggplot(df_act2, aes(x=Sport, y=Ratio))  + geom_bar(stat = "identity") + g
 
 grid.arrange(plt9,plt10, ncol=2)
 ```
+Next Steps:
+- Lineare Regressionsmodell zur Modelierung der Wahrscheinlichkeit einer Herzkrankheit
+
+
+Benötige hierzu:
+- alpha
+- alle betas zu den einzelnen Variablen: kontinuierliche: BMI, Blutdruck, Cholisterol
+                                        disket: Glucose, Alkohol, Rauchen, Sport
+```{r}
+library(ggplot2)
+colnames(df_1)
+model <- lm(cardio ~ BMI+ap_hi+ap_lo+cholesterol+gluc+smoke+alco+active+BMI, data=df_1  )
+summary(model)
+sigma(model)/mean(df_1$cardio)
+ggplotRegression(lm(cardio ~ BMI, data=df_1))
+ggplot(df_1, aes(x = BMI, y = cardio)) + 
+  geom_point() +
+  stat_smooth(method = "lm", col = "red")
+```
+
+
+
 
