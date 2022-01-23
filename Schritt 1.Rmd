@@ -20,6 +20,7 @@ BMI (Body-Mass-Index): ist definiert als BMI = (weight)/(height)^2
 ```{r}
 library(tidyverse)
 library(patchwork)
+library(gridExtra)
 ```
 
 
@@ -101,7 +102,7 @@ p2c <- pie(t2c, labels = beschriftung ,main = "Cholesterolwerte der kranken Pati
 
 #Plots zusammenfügen (nebeneinander):
 
-p1c + p2c
+grid.arrange(p1c ,p2c)
 ```
 Nun die Glucosewerte:
 ```{r}
