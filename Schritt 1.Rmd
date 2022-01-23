@@ -17,6 +17,10 @@ BMI (Body-Mass-Index): ist definiert als BMI = (weight)/(height)^2
 "schlechter Blutdruck": ap_hi >= 140 oder ap_lo >= 90 dabei basieren wir uns auf der schweizerischen Herzstiftung.
 
 
+```{r}
+library(tidyverse)
+library(patchwork)
+```
 
 
 
@@ -67,7 +71,67 @@ summary(df_krank$BMI)
 
 Man sieht anhand des Plot und der Tabellen, dass die kranken Patienten einen leicht höheren BMI vorweisen, als die gesunden. Entsprechend 26.483 und 28.473 im Mittel. Ab einem BMI von 
 
+```{r}
+gesunde <- filter(df_1, cardio == 0)
+kranke <- filter(df_1, cardio == 1) 
+```
 
+Zuerst die Cholesterolwerte:
+```{r}
+#Plot der Cholwerte der gesunden Patienten:
+t1c <- table(gesunde$cholesterol)
+t1c <- (t1c/sum(t1c))*100
+
+prozent <- round(t1c)
+cholwerte <- c("gute Cholesterolwerte" , "mittelgute Cholesterolwerte" , "schlechte Cholesterolwerte")
+
+beschriftung <- paste(cholwerte,prozent, "%", sep = " ")
+p1c <- pie(t1c, main = "Cholesterolwerte der gesunden Patienten",labels = beschriftung , col = c("green" , "orange" , "red"))
+
+#Plot der Cholwerte der kranken Patienten:
+
+t2c <- table(kranke$cholesterol)
+t2c <- (t2c/sum(t2c))*100
+
+prozent <- round(t2c)
+cholwerte <- c("gute Cholesterolwerte" , "mittelgute Cholesterolwerte" , "schlechte Cholesterolwerte")
+
+beschriftung <- paste(cholwerte,prozent, "%", sep = " ")
+p2c <- pie(t2c, labels = beschriftung ,main = "Cholesterolwerte der kranken Patienten", col = c("green" , "orange" , "red"))
+
+#Plots zusammenfügen (nebeneinander):
+
+p1c + p2c
+```
+Nun die Glucosewerte:
+```{r}
+#die gesunden Patienten:
+
+t1g <- table(gesunde$gluc)
+t1g <- (t1g/sum(t1g))*100
+
+prozent <- round(t1g)
+glucwerte <- c("gute Glucosewerte" , "mittelgute Glucosewerte" , "schlechte Glucosewerte")
+
+beschriftung <- paste(glucwerte,prozent, "%", sep = " ")
+p1c <- pie(t1g, main = "Glucosewerte der gesunden Patienten",labels = beschriftung , col = c("green" , "orange" , "red"))
+
+#die kranken Patienten:
+
+t2g <- table(kranke$gluc)
+t2g <- (t2g/sum(t2g))*100
+
+prozent <- round(t2g)
+glucwerte <- c("gute Glucosewerte" , "mittelgute Glucosewerte" , "schlechte Glucosewerte")
+
+beschriftung <- paste(glucwerte,prozent, "%", sep = " ")
+p2g <- pie(t2g, main = "Glucosewerte der kranken Patienten",labels = beschriftung , col = c("green" , "orange" , "red"))
+
+#Plots zusammenfügen:
+
+p1g + p2g
+
+```
 
 
 
