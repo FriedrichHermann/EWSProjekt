@@ -75,62 +75,102 @@ Man sieht anhand des Plot und der Tabellen, dass die kranken Patienten einen lei
 ```{r}
 gesunde <- filter(df_1, cardio == 0)
 kranke <- filter(df_1, cardio == 1) 
+
+g_cholwerte <- filter(df_1, cholesterol == 1) #g_ für gute , m_ für mittelgute , s_ für schlechte Werte
+m_cholwerte <- filter(df_1, cholesterol == 2)
+s_cholwerte <- filter(df_1, cholesterol == 3)
+
+g_glucwerte <- filter(df_1 , gluc == 1)
+m_glucwerte <- filter(df_1 , gluc == 2)
+s_glucwerte <- filter(df_1 , gluc == 3)
+
 ```
 
-Zuerst die Cholesterolwerte:
 ```{r}
-#Plot der Cholwerte der gesunden Patienten:
-t1c <- table(gesunde$cholesterol)
-t1c <- (t1c/sum(t1c))*100
 
-prozent <- round(t1c)
-cholwerte <- c("gute Cholesterolwerte" , "mittelgute Cholesterolwerte" , "schlechte Cholesterolwerte")
+#Zuerst die Patienten mit guten Cholwerten
+tcg <- table(g_cholwerte$cardio)
+tcg <- (tcg/sum(tcg))*100
 
-beschriftung <- paste(cholwerte,prozent, "%", sep = " ")
-p1c <- pie(t1c, main = "Cholesterolwerte der gesunden Patienten",labels = beschriftung , col = c("green" , "orange" , "red"))
+prozent <- round(tcg)
 
-#Plot der Cholwerte der kranken Patienten:
+krankheitsstand <- c("gesund","krank")
 
-t2c <- table(kranke$cholesterol)
-t2c <- (t2c/sum(t2c))*100
+beschriftung <- paste(krankheitsstand, prozent, "%", sep = " ")
+pcg <- pie(prozent, main = "Kranksheitszustand der Patient:innen mit guten Cholesterolwerten",labels = beschriftung , col = c("green" , "red"))
+pcg
 
-prozent <- round(t2c)
-cholwerte <- c("gute Cholesterolwerte" , "mittelgute Cholesterolwerte" , "schlechte Cholesterolwerte")
+# Danach die Patienten mit mittelguten Cholwerten
 
-beschriftung <- paste(cholwerte,prozent, "%", sep = " ")
-p2c <- pie(t2c, labels = beschriftung ,main = "Cholesterolwerte der kranken Patienten", col = c("green" , "orange" , "red"))
+tcm <- table(m_cholwerte$cardio)
+tcm <- (tcm/sum(tcm))*100
 
-#Plots zusammenfügen (nebeneinander):
+prozent <- round(tcm)
 
-grid.arrange(p1c ,p2c)
+krankheitsstand <- c("gesund","krank")
+
+beschriftung <- paste(krankheitsstand, prozent, "%", sep = " ")
+pcm <- pie(prozent, main = "Kranksheitszustand der Patient:innen mit mittelguten Cholesterolwerten",labels = beschriftung , col = c("green" , "red"))
+pcm
+
+#Schließlich die Patienten mit schlechten Cholwerten
+
+tcs <- table(s_cholwerte$cardio)
+tcs <- (tcs/sum(tcs))*100
+
+prozent <- round(tcs)
+
+krankheitsstand <- c("gesund","krank")
+
+beschriftung <- paste(krankheitsstand, prozent, "%", sep = " ")
+pcs <- pie(prozent, main = "Kranksheitszustand der Patient:innen mit schlechten Cholesterolwerten",labels = beschriftung , col = c("green" , "red"))
+pcs
+
+
 ```
+
+
+
+
+
 Nun die Glucosewerte:
 ```{r}
-#die gesunden Patienten:
 
-t1g <- table(gesunde$gluc)
-t1g <- (t1g/sum(t1g))*100
+#Zuerst die Patienten mit guten Glucwerten
+tgg <- table(g_glucwerte$cardio)
+tgg <- (tgg/sum(tgg))*100
 
-prozent <- round(t1g)
-glucwerte <- c("gute Glucosewerte" , "mittelgute Glucosewerte" , "schlechte Glucosewerte")
+prozent <- round(tgg)
 
-beschriftung <- paste(glucwerte,prozent, "%", sep = " ")
-p1c <- pie(t1g, main = "Glucosewerte der gesunden Patienten",labels = beschriftung , col = c("green" , "orange" , "red"))
+krankheitsstand <- c("gesund","krank")
 
-#die kranken Patienten:
+beschriftung <- paste(krankheitsstand, prozent, "%", sep = " ")
+pgg <- pie(prozent, main = "Kranksheitszustand der Patient:innen mit guten Glucosewerten",labels = beschriftung , col = c("green" , "red"))
+pgg
 
-t2g <- table(kranke$gluc)
-t2g <- (t2g/sum(t2g))*100
+#Danach die Patienten mit mittelguten Glucwerten
+tgm <- table(m_glucwerte$cardio)
+tgm <- (tgm/sum(tgm))*100
 
-prozent <- round(t2g)
-glucwerte <- c("gute Glucosewerte" , "mittelgute Glucosewerte" , "schlechte Glucosewerte")
+prozent <- round(tgm)
 
-beschriftung <- paste(glucwerte,prozent, "%", sep = " ")
-p2g <- pie(t2g, main = "Glucosewerte der kranken Patienten",labels = beschriftung , col = c("green" , "orange" , "red"))
+krankheitsstand <- c("gesund","krank")
 
-#Plots zusammenfügen:
+beschriftung <- paste(krankheitsstand, prozent, "%", sep = " ")
+pgm <- pie(prozent, main = "Kranksheitszustand der Patient:innen mit mittelguten Glucosewerten",labels = beschriftung , col = c("green" , "red"))
+pgm
 
-p1g + p2g
+#Schließlich die Patienten mit schlechten Glucwerten
+tgs <- table(s_glucwerte$cardio)
+tgs <- (tgs/sum(tgs))*100
+
+prozent <- round(tgs)
+
+krankheitsstand <- c("gesund","krank")
+
+beschriftung <- paste(krankheitsstand, prozent, "%", sep = " ")
+pgs <- pie(prozent, main = "Kranksheitszustand der Patient:innen mit schlechten Glucosewerten",labels = beschriftung , col = c("green" , "red"))
+pgs
 
 ```
 
