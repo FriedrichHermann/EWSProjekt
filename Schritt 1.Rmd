@@ -41,7 +41,7 @@ df_1_plot <- filter(df_1, ap_lo < 250,ap_lo > 20, ap_hi < 250,ap_hi > 20, BMI < 
 p <- ggplot(df_1_plot, aes(x = ap_lo , y = ap_hi )) + geom_point(aes(color = ifelse(cardio == 0 , 'green' ,'red'))) + scale_colour_manual(labels = c("0","1"), values = c('green','red')) +
  labs(color = "Krankheit")
 
-p + geom_segment(aes(x = 20, y = 139 , xend = 89 ,yend = 139)) + geom_segment(aes(x = 89, y = 20 , xend = 89 ,yend = 139)) + geom_segment(aes(x = 20, y = 20 , xend = 89 ,yend = 20)) + geom_segment(aes(x = 20, y = 20 , xend = 20 ,yend = 139)) + labs(title = "Blutdruck-Profil der Patienten") #hier habe ich zwei Segmente im Plot eingezeichnet, um die Gruppe mit niedrigem Blutdruck von der Gruppe mit hohem Blutdruck im zu unterscheiden. 
+p + geom_segment(aes(x = 20, y = 139 , xend = 89 ,yend = 139)) + geom_segment(aes(x = 89, y = 20 , xend = 89 ,yend = 139)) + geom_segment(aes(x = 20, y = 20 , xend = 89 ,yend = 20)) + geom_segment(aes(x = 20, y = 20 , xend = 20 ,yend = 139)) + labs(title = "Blutdruck-Profil der Patienten") #hier habe ich zwei Segmente im Plot eingezeichnet, um die Gruppe mit niedrigem Blutdruck von der Gruppe mit hohem Blutdruck graphisch zu unterscheiden. 
 
 
 
@@ -50,9 +50,32 @@ p + geom_segment(aes(x = 20, y = 139 , xend = 89 ,yend = 139)) + geom_segment(ae
 Innerhalb des Quadrats befindet sich die Gruppe an Patienten, die gute Blutdruckwerte haben (siehe Definition) und außerhalb des Quadrats solche, die schlechte Blutdruckwerte haben.
 
 
-Am Plot erkennt man, dass sich im Quadrat mehr grüne als rote, und außerhalb deutlich mehr rote als grüne befinden. 
+Krankheitsrate in der Gruppe mit schlechtem Blutdruck 
+```{r}
 
-das muss ich noch Ergänzen
+g_blutdruck <- filter(df_1_plot , ap_hi < 140 , ap_lo < 90)
+
+
+k_g_blutdruck <- filter(g_blutdruck, cardio == 1)
+
+
+length(k_g_blutdruck$cardio)/length(g_blutdruck$cardio)
+
+
+```
+
+Krankheitsrate in der Gruppe mit gutem Blutdruck
+```{r}
+s_blutdruck <- filter(df_1_plot, ap_hi >= 140 | ap_lo >=  90) 
+k_s_blutdruck <- filter(s_blutdruck, cardio == 1)
+
+length(k_s_blutdruck$cardio)/length(s_blutdruck$cardio)
+```
+Man sieht also, dass in der Gruppe mit normalem Blutdruck die krankheitsrate deutlich geringer ist, als in der Gruppe mit schlechtem Blutdruck. 
+
+
+
+
 ```{r}
 
 p <- ggplot(df_1_plot, aes(cardio,BMI)) + geom_boxplot(aes(color = ifelse(cardio == 0 , 'green' ,'red'))) + scale_colour_manual(labels = c("0","1"), values = c('green','red')) + labs(color = 'Krankheit', title = 'BMI-Profil der Patienten') + theme( aspect.ratio = 1.5) 
