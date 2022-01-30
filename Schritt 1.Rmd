@@ -50,7 +50,7 @@ p + geom_segment(aes(x = 20, y = 139 , xend = 89 ,yend = 139)) + geom_segment(ae
 Innerhalb des Quadrats befindet sich die Gruppe an Patienten, die gute Blutdruckwerte haben (siehe Definition) und außerhalb des Quadrats solche, die schlechte Blutdruckwerte haben.
 
 
-Krankheitsrate in der Gruppe mit schlechtem Blutdruck 
+Krankheitsrate in der Gruppe mit gutem Blutdruck 
 ```{r}
 
 g_blutdruck <- filter(df_1_plot , ap_hi < 140 , ap_lo < 90)
@@ -64,7 +64,7 @@ length(k_g_blutdruck$cardio)/length(g_blutdruck$cardio)
 
 ```
 
-Krankheitsrate in der Gruppe mit gutem Blutdruck
+Krankheitsrate in der Gruppe mit schlechtem Blutdruck
 ```{r}
 s_blutdruck <- filter(df_1_plot, ap_hi >= 140 | ap_lo >=  90) 
 k_s_blutdruck <- filter(s_blutdruck, cardio == 1)
