@@ -199,6 +199,69 @@ pgs
 
 ```
 
+Abschließend für diesen Teil möchten Wir einen Hypothesentest durchführen, um nachzuweisen, dass menschen mit schlechter Gesundheit überdurchschnittlich stark von kardiovaskulären Krankheiten betroffen sind. 
+
+Wir definieren eine Gruppe von Patienten, die eine "schlechte Gesundheit" haben:
+
+Die Patienten für die folgendes zutrifft sind teil der Gruppe:
+
+-schlechter Blutdruck (Def von oben)
+-mittelgute und schlechte Glucose- und Cholesterolwerte.
+- BMI > 25
+
+Durchschnittlich erleiden 49.97 % der Patienten in unserem Datensatz an einer kardiovasculären Krankheit.
+
+```{r}
+sum(df_1$cardio)/70000
+```
+Nun bilden wir unsere Gruppe der ungesunden: 
+
+```{r}
+ungesund <- filter(df_1, gluc == 2 | gluc == 3) 
+ungesund <- filter(ungesund, cholesterol == 2 | cholesterol == 3) 
+ungesund <- filter(ungesund, BMI > 25)
+ungesund <- filter(ungesund, ap_hi > 139 | ap_lo > 89)
+length(ungesund$cardio)
+```
+#folgendes möchte ich mit Latex Knits schöner gestalten 
+
+Wir betrachten das statistische Modell
+
+(omega = {1,...,2831}, F = P(omega), P_theta = Binomial(2831,theta))
+
+zum Testproblem: H0= theta <= 0.4997 , H1 = theta > 0.4997
+
+Ein gleichmäßig bester Test ist nach der Vorlesung der Form : siehe VL 
+
+Der R-Befehl 
+```{r}
+qbinom(0.01, size = 2831, prob = 0.4997, lower.tail = FALSE)
+```
+Damit ist K = {1477, ... , 2831} der Ablehnungsbereich des Test zum Signifikanzniveau 1%. 
+
+Wir haben
+```{r}
+sum(ungesund$cardio)
+```
+Damit ist die Nullhypothese (bei weitem) verworfen. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
