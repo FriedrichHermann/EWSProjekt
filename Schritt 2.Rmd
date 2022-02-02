@@ -142,12 +142,8 @@ Next Steps:
 Welche Lineare Regression ist hier sinnvoll?
 Stichwort: Lineare Regression mit einer bivariaten abhängigen Variable
 - wir nehmen das im Interent vorgeschlagene linear probabilty model (https://www.econometrics-with-r.org/11-rwabdv.html)
-- Benötigte Packages:
-```{r}
 
-library(AER)
-library(stargazer)
-```
+
 
 Beschreibung des linear probability models:
 - Wir haben zwei vershcieden Werte die Y_i annehmen kann. Einmal Y_i = 1 und Y_i = 0 in abhänigkeit unserer Einflussgrößen X_i_n. Y_i ist also Bernoulli verteilt mit Erwartungswert p. P ist entsprechend die Wahrscheinlichkeit für Y=1 in Abhängigkeit gegebener Einflussgrößern.
@@ -237,14 +233,27 @@ df_schlecht_predict$prediction <- prediction_schlecht
 Plot of "predicitons" vs Normal distribution
 
 ```{r}
-m <- mean(df_predict$prediction)
-std <- sqrt(var(df_predict$prediction))
+
 x<-df_predict$prediction
-h<- hist(x)
+z <- df_gut_predict$prediction
+b<-df_schlecht_predict$prediction
+h.x<-hist(x)
 xfit<-seq(min(x),max(x),length=40)
-yfit<-dnorm(xfit,mean=mean(x),sd=sd(x))
-yfit <- yfit*diff(h$mids[1:2])*length(x)
-lines(xfit, yfit, col="blue", lwd=2)
+
+y.xfit<-dnorm(xfit,mean=mean(x),sd=sd(x))
+y.xfit <- y.xfit*diff(h.x$mids[1:2])*length(x)
+lines(xfit, y.xfit, col="blue", lwd=2)
+h.b<-hist(b)
+bfit <- seq(min(b),max(b),length=40)
+y.bfit<-dnorm(bfit,mean=mean(b),sd=sd(b))
+y.bfit <- y.bfit*diff(h.b$mids[1:2])*length(b)
+lines(bfit, y.bfit, col="blue", lwd=2)
+h.z<-hist(z)
+zfit <- seq(min(z),max(z),length=40)
+y.zfit<-dnorm(zfit,mean=mean(z),sd=sd(z))
+y.zfit <- y.zfit*diff(h.z$mids[1:2])*length(z)
+lines(zfit, y.zfit, col="blue", lwd=2)
+
 
 ```
 
@@ -282,5 +291,14 @@ compare_df
 ```{r}
 
 ```
+
+Textstruktur:
+1. Genauere Beschreibung der linearen Regression sowie dem Koeffizientenbaum
+2. Darüber hinaus auch beschriebung der p-Werte der Koeffizienten
+3. Eingehen auf die verschiedenen tests die verwendet werden um die lineare Regression zu beschreiben
+4. Vergleich der vorhergesagten Werte mit den wahren Werten
+
+
+
 
 
