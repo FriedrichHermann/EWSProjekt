@@ -156,17 +156,12 @@ Benötige hierzu:
 - alle betas zu den einzelnen Variablen: kontinuierliche: BMI, Blutdruck, Cholisterol
                                         disket: Glucose, Alkohol, Rauchen, Sport
 ```{r}
-library(ggplot2)
-df_2 <- df_1
-df_2$id <- NULL
-df_2$BMI <- NULL
-colnames(df_2)
-model <- lm(cardio ~ age+gender+height+weight+ap_hi+ap_lo+cholesterol+gluc+smoke+alco+active,data=df_2  )
-summary(model)
+glm.model <- glm(cardio ~ age+gender+BMI+ap_hi+ap_lo+cholesterol+gluc+smoke+alco+active,family = binomial(link = "probit"),data=df_1, control = list(maxit = 100))
 
-chisq.test(model$fitted.values, df_2$cardio)
-sigma(model)/mean(df_2$cardio)
+summary(glm.model)
+
 ```
+
 
 
 
@@ -192,10 +187,11 @@ p.mat <- cor_pmat(df_2)
 head(p.mat)
 
 ggcorrplot(corr, hc.order = TRUE, type="lower", p.mat=p.mat)
-
 ```
 ```{r}
+library(tidyverse)
 ggcorrplot(corr, hc.order = TRUE, type="lower", lab=TRUE)
+
 
 ```
 
@@ -205,9 +201,8 @@ Next Steps:
 
 ```{r}
 #datasets for prediction tutti
-df_predict <- df_2
-df_predict$cardio <- NULL
-prediction_tot <- predict(model, newdata = df_predict)
+df_predict <- df_1
+prediction_tot <- predict(glm.model, newdata = df_predict, type="response")
 df_predict$prediction <- prediction_tot 
 df_predict
 
@@ -215,8 +210,8 @@ df_predict
 df_gut_predict <- df_gut
 df_gut_predict$cardio <- NULL
 df_gut_predict$id <- NULL
-df_gut_predict$BMI <- NULL
-prediction_gut <- predict(model, newdata = df_gut_predict)
+
+prediction_gut <- predict(glm.model, newdata = df_gut_predict,type="response")
 df_gut_predict$prediction <- prediction_gut 
 
 
@@ -224,11 +219,18 @@ df_gut_predict$prediction <- prediction_gut
 df_schlecht_predict <- df_schlecht
 df_schlecht_predict$cardio <- NULL
 df_schlecht_predict$id <- NULL
-df_schlecht_predict$BMI <- NULL
-prediction_schlecht <- predict(model, newdata = df_schlecht_predict)
+
+prediction_schlecht <- predict(glm.model, newdata = df_schlecht_predict,type="response")
 df_schlecht_predict$prediction <- prediction_schlecht
 
 ```
+
+# Plot der Predictions mit Realen daten
+```{r}
+ggplot(df_predict, aes(x=BMI , y=cardio)) + xlim(0, 100) + geom_point() + geom_smooth(method = 'glm', method.args = list(family = binomial(link = "probit")))
+
+```
+
 
 Plot of "predicitons" vs Normal distribution
 
