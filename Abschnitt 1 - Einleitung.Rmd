@@ -1,0 +1,29 @@
+---
+title: "Abschnitt 1 - Einleitung"
+output: html_document
+---
+In diesem R-Projekt haben wir uns als Ziel gesetzt, den Einfluss der Gesundsheitslage einer Person - beeinflusst vom ihrem Lebenstil, wie wir es sehen werden - auf die Entwicklung einer kardiovaskulären Krankheit zu untersuchen. Dazu werden wir die Daten des Datensatzes cardio_train untersuchen, der Variablen bezüglich des Gesundheitsstandes, des Lebenstils und des Vorliegens einer kardiovaskulären Krankheit von 70000 Patient:innen enthält. Die Daten wurden während medizinischen Untersuchungen erhoben, jedoch ist genaueres nicht bekannt. 
+Hier ein Überblick der, mit der Variable BMI erweiterten, Variablen des Datensatzes: 
+
+```{r}
+df_1 <-read.csv("cardio_train.csv", sep=";")
+df_1$age <- df_1$age/365
+df_1$height <- df_1$height/100
+df_1 <- cbind(df_1 , "BMI" = (df_1$weight)/(df_1$height)^2 )
+head(df_1)
+```
+ Unsere Absicht ist es zu untersuchen, ob der Gesundheitsstand einen Einfluss auf das Vorliegen einer kardiovaskulären Krankheit hat; und wiederum, ob der Lebensstil einen Einfluss auf den Gesundheitsstand hat. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
