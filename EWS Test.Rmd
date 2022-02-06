@@ -17,12 +17,20 @@ Forschungsfrage:
 
 2. Explorative Datenanalyse: Erstellt eine Beschreibung des Datensatzes, die sowohl numerische Zusammenfassungen (deskriptive Statistiken) als auch entsprechende Grafiken enthält. Konzentriert euch bei größeren Datensätzen auf die Variablen, die ihr in Abschnitt 4 genauer analysiert.
 
-
-
+- Mathis Teil + Frenklis
 
 3. Methoden: Beschreibt kurz die von euch verwendete(n) statistischen Methode(n). Gebt Referenzen auf entsprechende Literatur für eine detaillierte Beschreibung.
 
+- Lineare Regression
+  - Tests
+- Hypothesentest
+
+- Text: Modelle durchführen und besprechen (noch keine Interpretation)
+
 4. Ergebnisse und Schlussfolgerungen: Identifiziert eine interessante abhängige Variable Y und mindestens eine Einflussvariable X. Die Variable X kann entweder kategoriell sein und für den Vergleich von zwei (oder mehr) Gruppen stehen oder metrisch. Im zweiten Fall wird man dann an einer Beschreibung des linearen Zusammenhangs zwischen X und Y interessiert sein. Wendet, die in Abschnitt 3 beschriebenen Methoden passend an und berichtet die Ergebnisse, die nötig sind um eure Forschungsfrage zu beantworten und zieht entsprechende Schlussfolgerungen.
+
+
+- Text: Interpretation der modelle und prognose des Modells verwenden um Beobachtungen aus der 2 zu replizieren
 
 
 1. Dataset aufrufen und ersten Eindruck der Daten bekommen
@@ -30,7 +38,7 @@ Forschungsfrage:
 df_1 <-read.csv("cardio_train.csv", sep=";")
 df_1$age <- df_1$age/365
 df_1$height <- df_1$height/100
-head(df_1)
+df_1
 
 ```
 2. Als nächstes Versuchen wir den Datensatz "aufzuräumen" indem wir nach fehlenden Werten suchen und die entsprechend des Kontextes eliminieren oder ersetzen mit einem sinnvollen Eintrag
@@ -43,4 +51,11 @@ length(unique(df_1$id)) == nrow(df_1) #schauen ob die Anzahl der einmaligen Id's
 -> es gibt keine fehlenden Einträge
 -> es gibt keine doppelten Einträge
 
-jhjhjhj
+
+
+
+
+
+
+
+
