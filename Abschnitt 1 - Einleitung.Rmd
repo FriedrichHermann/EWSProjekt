@@ -2,7 +2,7 @@
 title: "Abschnitt 1 - Einleitung"
 output: html_document
 ---
-Die folgende Analyse des vorliegenden Datensatzes dient der Untersuchung des Einflusses verschiedener Faktoren im Zusammenhang mit dem individuellen Lebensstils einer Person, auf die Entwicklung einer kardiovaskulären Krankheit.
+Die folgende Analyse des vorliegenden Datensatzes dient der Untersuchung des Einflusses verschiedener Faktoren, im Zusammenhang mit dem individuellen Lebensstil einer Person, auf die Entwicklung einer kardiovaskulären Krankheit.
 Dazu werden die Daten des Datensatzes cardio_train untersucht, der Variablen bezüglich des Gesundheitsstandes, des Lebenstils und des Vorliegens einer kardiovaskulären Krankheit von 70000 Patient:innen enthält. Der Datensatz wurde von Kaggle.com (genauerer link) bereitgestellt.
 Hier ein Überblick der, mit der Variable BMI erweiterten, Variablen des Datensatzes: 
 
