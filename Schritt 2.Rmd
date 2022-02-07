@@ -34,6 +34,7 @@ Gruppe 2 (Übergewicht/ Untergewicht und Bluthochdruck):
 - ap_hi >130
 
 ```{r}
+df_1$id <- NULL
 df_gut<-df_1 %>% filter(BMI >= 18) %>% filter(BMI <= 25) %>% filter(ap_lo<=89) %>%filter(ap_hi<=139)
 df_schlecht_1<-df_1 %>% filter(BMI < 18, ap_lo > 89, ap_hi > 139)
 df_schlecht_2<-df_1 %>% filter(BMI > 25, ap_lo > 89, ap_hi > 139)
@@ -159,7 +160,7 @@ Benötige hierzu:
 glm.model <- glm(cardio ~ age+gender+BMI+ap_hi+ap_lo+cholesterol+gluc+smoke+alco+active,family = binomial(link = "probit"),data=df_1, control = list(maxit = 100))
 
 summary(glm.model)
-
+?summary
 ```
 
 
@@ -181,9 +182,9 @@ Aufzeigen der Korrelation zwischen variablen und cardio, sowie den variablen unt
 
 ```{r}
 
-corr <- cor(df_2)
+corr <- cor(df_1)
 corr
-p.mat <- cor_pmat(df_2)
+p.mat <- cor_pmat(df_1)
 head(p.mat)
 
 ggcorrplot(corr, hc.order = TRUE, type="lower", p.mat=p.mat)
@@ -285,8 +286,8 @@ MSE <- function(x,y){
   }
   return(z/length(x))
 }
-compare_df <- data.frame(c("Total","Gut","Schlecht"), c(mean_tut, mean_gut, mean_schlecht),c(mean_pred_tut, mean_pred_gut, mean_pred_schlecht), c(MSE(df_1$cardio, df_predict$prediction), MSE(df_gut$cardio, df_gut_predict$prediction), MSE(df_schlecht$cardio, df_schlecht_predict$prediction) ))
-colnames(compare_df) <- c("Betrachtete Gruppe", "Wahrer Median", "Model Median", "Mittlere quadratische Fehler")
+compare_df <- data.frame(c("Total","Gut","Schlecht"), c(mean_tut, mean_gut, mean_schlecht),c(mean_pred_tut, mean_pred_gut, mean_pred_schlecht))
+colnames(compare_df) <- c("Betrachtete Gruppe", "Wahrer Median", "Model Median")
 
 compare_df
 ```
