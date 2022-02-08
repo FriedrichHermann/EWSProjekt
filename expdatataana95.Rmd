@@ -1,0 +1,179 @@
+---
+title: "Cardiovascular Disease Prediction Visualizations (By: Frenkli Axha)"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+```
+
+```{r, include=FALSE}
+library(tidyverse)
+library(dplyr)
+library(data.table)
+library(magrittr)
+library(ggplot2)
+library(ggthemes)
+library(hrbrthemes)
+df <-read.csv("cardio_train.csv", sep=";")
+df$age<- df$age/365
+```
+
+# Summary of data set:
+
+*  descriptive stats for all variables
+```{r}
+#Creating a table with the basic information from the data frame: the minimum value, maximum, mean,
+summary(object = df)
+```
+
+* structure of our dataset:
+```{r}
+str(df)
+```
+
+* variables:
+```{r}
+colnames(df)
+```
+
+* number of missing values 
+```{r}
+
+#In this stage, we want to achieve a clean data set, where there are no duplicates, or missing variables.
+#Secondly, we have to extrct all the important variables that we need for the patients such as: Age, gender and height.
+
+number_of_columns <- ncol(df) #here the number of columns/variables is returned
+number_of_lines <- nrow(df)   #here the number of rows/observations is returned
+
+#Check whether there are any missing values in the dataframe --> NA
+missing_values <- is.na(df)
+
+#Number of missing variables if any
+sum(missing_values)
+```
+
+* number of unique IDs
+```{r}
+#Since there are no missing values we can continue with fixing the presentation of the gender variable, by splitting it in two categories for males and females:
+
+#Checking for duplicated IDs:
+length(unique(df$id))
+
+```
+
+* range of all variables:
+```{r}
+apply(df, 2, range)
+
+```
+
+* mean of all variables (as seen also on the summary):
+```{r}
+colMeans(df)
+```
+
+* variance of all variables:
+```{r}
+apply(df, 2, var)
+```
+
+## Boxplots of Age, Weight, Height, Cardio by Age and Active by Age:
+* Boxplot Age:
+```{r}
+boxplot(df$age, main = "Age boxplot", ylab = "Age")
+```
+
+
+* Boxplot height:
+```{r}
+boxplot(df$height, main = "Height boxplot", ylab = "Height")
+```
+
+* Boxplot weight:
+```{r}
+boxplot(df$weight, main = "Boxplot weight", ylab = "Weight")
+```
+
+* Boxplot Cardio:
+Boxplots to compare the age and body mass index for the cardio and non-cardio patients.
+```{r}
+boxplot(df$age~df$cardio, main = "Cardio distriburions per age (in days)", ylab = "Age", xlab = "Cardio")+ theme_clean()
+```
+
+* Boxplot Active:
+Boxplots to compare the age and body mass index for the active and non-active patients.
+```{r}
+boxplot(df$age~df$active, main = "Active distriburions per age", ylab = "Age", xlab = "Active")+ theme_clean()
+```
+
+## Gender distrbution: Count of Males and Females:
+
+```{r}
+ggplot(df, aes(fill=as.factor(gender))) + geom_bar(aes(x = as.factor(gender)))+ scale_fill_hue(c = 40)  + ylab ("Count") + xlab("Gender")+ labs(title="Gender distribution")  +  theme(legend.position="right",axis.title.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank())+ scale_fill_discrete(name = "Gender", labels = c("F", "M"))+ theme_clean()
+
+```
+
+## Age distribution:
+
+```{r}
+ggplot(df, aes(x=age)) + 
+  geom_histogram(fill = "#FF6A6A") + theme_clean()   + ylab ("Count") + xlab("Age")+ labs(title="Age distribution")
+```
+
+## Cholesterol distribution between men and women: 
+
+```{r}
+ggplot(df)+geom_bar(aes(x = cholesterol, fill = as.factor(gender)))+xlab("Cholesterol Level") + ylab ("Count") + labs(title="Cholesterol distribution")  +facet_grid(facets = df$gender) + theme_clean()+ scale_fill_discrete(name = "Gender", labels = as.factor(c("F", "M"))) 
+```
+## Distribution of smoking between men and women:
+
+```{r}
+#TODO check gender labels
+ggplot(df, aes(fill = as.factor(gender))) + 
+  geom_bar(aes(x = as.factor(smoke))) +
+  coord_flip()+ scale_fill_hue(c = 40)  + ylab ("Count") + xlab ("Smoke")+ labs(title="Smoke by gender distribution")  +  theme(legend.position="right")+ scale_fill_discrete(name = "Gender", labels = c("F", "M"))+theme_clean()
+```
+# Explorative statistics
+
+## Activeness by age groups:
+```{r}
+
+agebreaks <- c(0,1,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,500)
+agelabels <- c("0-1","1-4","5-9","10-14","15-19","20-24","25-29","30-34",
+               "35-39","40-44","45-49","50-54","55-59","60-64","65-69",
+               "70-74","75-79","80-84","85+")
+
+setDT(df)[ , agegroups := cut(age, 
+                                breaks = agebreaks, 
+                                right = FALSE, 
+                                labels = agelabels)]
+plot<- df%>%
+  group_by(active)%>%
+  count(agegroups)
+ggplot(plot, aes(y =n, x = as.factor(active)))+ geom_bar(stat='identity', aes(fill = as.factor(active)))+ facet_wrap(facets = plot$agegroups, scales="free_y")+xlab("Active") + ylab ("Count") + labs(title="Active by age")+ scale_fill_discrete(name = "Active", labels = as.factor(c("Not active", "Active"))) 
+```
+
+## Glucose by age groups:
+```{r}
+plot<- df%>%
+    group_by(gluc)%>%
+    count(agegroups)
+
+ggplot(plot, aes(y =n, x = as.factor(gluc)))+ geom_bar(stat='identity', aes(fill = as.factor(gluc)))+ facet_wrap(facets = plot$agegroups, scales="free_y")+xlab("Glucose levels") + ylab ("Count") + labs(title="Glucose by age groups")+ scale_fill_discrete(name = "gluc", labels = as.factor(c("Normal", "Above normal", "Way above normal")))
+```
+
+## Cholesterol by age groups:
+```{r}
+plot2<- df%>%
+    group_by(cholesterol)%>%
+    count(agegroups) 
+ggplot(plot2, aes(y =n, x = as.factor(cholesterol)))+ geom_bar(stat='identity', aes(fill = as.factor(cholesterol)))+ facet_wrap(facets = plot$agegroups, scales="free_y")+xlab("Cholesterol levels") + ylab ("Count") + labs(title="Cholesterol by age groups")+ scale_fill_discrete(name = "Cholesterol", labels = as.factor(c("Normal", "Above normal", "Way above normal"))) 
+```
+
+
