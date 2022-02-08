@@ -14,6 +14,8 @@ df_1 <-read.csv("cardio_train.csv", sep=";")
 df_1$age <- df_1$age/365
 df_1$height <- df_1$height/100
 df_1 <- cbind(df_1 , "BMI" = (df_1$weight)/(df_1$height)^2 )
+df_1$height<- NULL
+df_1$weight <- NULL
 head(df_1)
 ```
 
@@ -156,29 +158,18 @@ Benötige hierzu:
 - alpha
 - alle betas zu den einzelnen Variablen: kontinuierliche: BMI, Blutdruck, Cholisterol
                                         disket: Glucose, Alkohol, Rauchen, Sport
+                                        
+                                        
+#Teil 3 Methoden: Probit Regression                             
+Textteil
+                                    
 ```{r}
 glm.model <- glm(cardio ~ age+gender+BMI+ap_hi+ap_lo+cholesterol+gluc+smoke+alco+active,family = binomial(link = "probit"),data=df_1, control = list(maxit = 100))
 
 summary(glm.model)
-?summary
 ```
 
-
-
-
-p value in regression
-- testet die Nullhypothes für jedes Argument, dass dieses gleich 0 ist
-- Der p-Wert beschreibt hierbei, bei welchem signifikanzlevel dieses verworfen werden konnte. Für signifikante variablen sucht man meist nach p-werten die kleiner also 5% sind
-
-
-Regressions koeffizienten
-- beschreiben die veränderung des Wertes bei einer einheitsveränderung der beschriebenen variable wenn alle anderen variablen konstant gehalten werden
-
-
-?Frage für die Runde. Kann ich den bekommenen wert als Wahrscheinlichkeit interpretieren dass die Menschen eine Herzstöung bekommen
-
-Next Steps:
-Aufzeigen der Korrelation zwischen variablen und cardio, sowie den variablen unter sich:
+#Methoden: Korrelationspyramide
 
 ```{r}
 
@@ -196,6 +187,9 @@ ggcorrplot(corr, hc.order = TRUE, type="lower", lab=TRUE)
 
 ```
 
+
+
+#Teil 4 Auswertung der Ergebnisse: Auswertung der Regression
 
 Next Steps:
 - Vergleiche die Median Wahrscheinlichkeit bei den Gruppen die wir als gesund und ungesund deklariert haben mit dem erhaltenen Regressionsmodell
@@ -226,9 +220,9 @@ df_schlecht_predict$prediction <- prediction_schlecht
 
 ```
 
-# Plot der Predictions mit Realen daten
+# Plot der Predictions mit Realen daten (Visualiesierung der Prognosed daten)
 ```{r}
-ggplot(df_predict, aes(x=BMI , y=cardio)) + xlim(0, 100) + geom_point() + geom_smooth(method = 'glm', method.args = list(family = binomial(link = "probit")))
+ggplot(df_predict, aes(x=BMI , y=cardio)) + xlim(0, 100) + geom_point() + geom_smooth(method = 'glm', method.args = list(family = binomial(link = "probit"))) +ggtitle("Probit Model gegeben der Veränderung des BMI") +ylab("Risiko einer kardiovaskulären Erkrankung")
 
 ```
 
@@ -240,18 +234,18 @@ Plot of "predicitons" vs Normal distribution
 x<-df_predict$prediction
 z <- df_gut_predict$prediction
 b<-df_schlecht_predict$prediction
-h.x<-hist(x)
+h.x<-hist(x, main="Verteilung der Gesamtgruppe", xlab="Risiko zu erkranken", ylab="Anzahl der Personen", ylim=c(0,8000))
 xfit<-seq(min(x),max(x),length=40)
 
 y.xfit<-dnorm(xfit,mean=mean(x),sd=sd(x))
 y.xfit <- y.xfit*diff(h.x$mids[1:2])*length(x)
 lines(xfit, y.xfit, col="blue", lwd=2)
-h.b<-hist(b)
+h.b<-hist(b, main="Verteilung der Gruppe mit schlechter Gesundheit", xlab="Risiko zu erkranken", ylab="Anzahl der Personen",ylim=c(0,2000))
 bfit <- seq(min(b),max(b),length=40)
 y.bfit<-dnorm(bfit,mean=mean(b),sd=sd(b))
 y.bfit <- y.bfit*diff(h.b$mids[1:2])*length(b)
 lines(bfit, y.bfit, col="blue", lwd=2)
-h.z<-hist(z)
+h.z<-hist(z, main="Verteilung der Gruppe mit guter Gesundheit", xlab="Risiko zu erkranken", ylab="Anzahl der Personen")
 zfit <- seq(min(z),max(z),length=40)
 y.zfit<-dnorm(zfit,mean=mean(z),sd=sd(z))
 y.zfit <- y.zfit*diff(h.z$mids[1:2])*length(z)
@@ -279,15 +273,13 @@ mean_pred_schlecht <- mean(df_schlecht_predict$prediction)
 
 
 ```{r}
-MSE <- function(x,y){
-  z=0
-  for (i in 1:length(x)){
-    z=z+(x[i]-y[i])^2
-  }
-  return(z/length(x))
+Abweichung <- function(x,y){
+  z=(abs(y-x)/x)*100
+  return(z)
 }
-compare_df <- data.frame(c("Total","Gut","Schlecht"), c(mean_tut, mean_gut, mean_schlecht),c(mean_pred_tut, mean_pred_gut, mean_pred_schlecht))
-colnames(compare_df) <- c("Betrachtete Gruppe", "Wahrer Median", "Model Median")
+
+compare_df <- data.frame(c("Total","Gut","Schlecht"), c(mean_tut, mean_gut, mean_schlecht),c(mean_pred_tut, mean_pred_gut, mean_pred_schlecht), c(Abweichung(mean_tut,mean_pred_tut),Abweichung(mean_gut,mean_pred_gut),Abweichung(mean_schlecht,mean_pred_schlecht)))
+colnames(compare_df) <- c("Betrachtete Gruppe", "Wahrer Median", "Model Median", "Prozentuale Abweichung")
 
 compare_df
 ```
