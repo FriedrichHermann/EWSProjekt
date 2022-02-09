@@ -138,26 +138,7 @@ plt10<-ggplot(df_act2, aes(x=Sport, y=Ratio))  + geom_bar(stat = "identity") + g
 
 grid.arrange(plt9,plt10, ncol=2)
 ```
-Next Steps:
-- Lineare Regressionsmodell zur Modelierung der Wahrscheinlichkeit einer Herzkrankheit
 
-
-Welche Lineare Regression ist hier sinnvoll?
-Stichwort: Lineare Regression mit einer bivariaten abhängigen Variable
-- wir nehmen das im Interent vorgeschlagene linear probabilty model (https://www.econometrics-with-r.org/11-rwabdv.html)
-
-
-
-Beschreibung des linear probability models:
-- Wir haben zwei vershcieden Werte die Y_i annehmen kann. Einmal Y_i = 1 und Y_i = 0 in abhänigkeit unserer Einflussgrößen X_i_n. Y_i ist also Bernoulli verteilt mit Erwartungswert p. P ist entsprechend die Wahrscheinlichkeit für Y=1 in Abhängigkeit gegebener Einflussgrößern.
-- Die beta werden also interpretiert als veränderung der Wahrscheinlichkeit für Y_i=1 bei fixierung aller anderen unabhängigen Variablen
-- Die Berechnung der beta kann hierbei mit dem OLS verfahren berechnet werden 
-- Ein großes Problem beim verwenden einer lineare Regression ist, dass sie den zusammenhang zwischen Wahrscheinlichkeit dass Y_i=1 und den unabhänigen Variablen als linear betrachtet. Entsprechend können prognosen 1 übersteigen
-
-Benötige hierzu:
-- alpha
-- alle betas zu den einzelnen Variablen: kontinuierliche: BMI, Blutdruck, Cholisterol
-                                        disket: Glucose, Alkohol, Rauchen, Sport
                                         
                                         
 #Teil 3 Methoden: Probit Regression 
