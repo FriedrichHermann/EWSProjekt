@@ -86,6 +86,7 @@ b3 <- boxplot(df_1$weight, main = "Gewichtsverteilung", ylab = "Gewicht")
 Es handelt sich also um Durchschnittlich 53 jährige, überwiegend weibliche Patient:innen.
 
 
+
 ### Nun ein Überblick vom Gesundheitsstand der Patient:innen. 
 
 
