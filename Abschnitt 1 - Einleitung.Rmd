@@ -13,7 +13,25 @@ df_1$height <- df_1$height/100
 df_1 <- cbind(df_1 , "BMI" = (df_1$weight)/(df_1$height)^2 )
 head(df_1)
 ```
- Unsere Absicht ist es zu untersuchen, ob der Gesundheitsstand einen Einfluss auf das Vorliegen einer kardiovaskulären Krankheit hat; und wiederum, ob der Lebensstil einen Einfluss auf den Gesundheitsstand hat. 
+
+Einerseits enthält der Datensatz Variablen bezüglich des Gesundheitsstandes der Patient:innen:\newline
+\newline
+-age : Alter der Patient:innen in Jahre.\newline
+-height : Größe der Patient:innen in Meter.\newline 
+-weight : Gewicht in kg.\newline
+-ap_hi : systolischer Blutdruck in mmHg.\newline
+-ap_lo : diastolischer Blutdruck in mmHg.\newline 
+-gluc : Glucoselevel im Blut auf einer Skala von 1 bis 3; wobei 1 "normale" Glucosewerte, 2 "mittelgute" Glucosewerte und 3 "schlechte" Glucosewerte beschreibt.\newline
+-cholesterol : Cholesterollevel im Blut auf einer Skala von 1 bis 3, analog zu gluc.\newline  
+-cardio : Vorliegen einer kardiovaskulären Krankheit in binär: 1 für das Vorliegen einer kardiovaskulären; 0 falls keine kardiovaskuläre Krankheit vorliegt. Dies ist die Zielvariable, die näher untersucht werden wird.\newline 
+\newline
+Andererseits enthält er Variablen bezüglich des Lebensstils der Patient:innen:  
+\newline
+-smoke : Raucheangewohnheit, 1: der Patient:in Raucht; 0: der Patient:in raucht nicht.\newline
+-alco : Alkoholkonsum, binär wie bei smoke.\newline
+-active : Sportangewohnheit, binär wie bei smoke.\newline
+\newline
+Unsere Absicht ist es zu untersuchen, ob der Gesundheitsstand einen Einfluss auf das Vorliegen einer kardiovaskulären Krankheit hat; und wiederum, ob der Lebensstil einen Einfluss auf den Gesundheitsstand hat. 
 
 
 
