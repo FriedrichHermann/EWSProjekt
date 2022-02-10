@@ -2,50 +2,7 @@
 title: "Schritt 2"
 output: html_document
 ---
-```{r}
-library(ggcorrplot)
-library(dplyr)
-library(ggplot2)
-library(gridExtra)
-```
 
-```{r}
-df_1 <-read.csv("cardio_train.csv", sep=";")
-df_1$age <- df_1$age/365
-df_1$height <- df_1$height/100
-df_1 <- cbind(df_1 , "BMI" = (df_1$weight)/(df_1$height)^2 )
-df_1$height<- NULL
-df_1$weight <- NULL
-head(df_1)
-```
-
-Schritt 2 - Untersuchen der Gruppierungen
-
-
-
-Gruppe 1 (Gute Gesundheit) 
-- BMI 18 bis 25
-ap_lo <80
-ap_hi <130
-
-
-Gruppe 2 (Übergewicht/ Untergewicht und Bluthochdruck):
-- BMI >25
-- BMI <18
-- ap_lo >80
-- ap_hi >130
-
-```{r}
-df_1$id <- NULL
-df_gut<-df_1 %>% filter(BMI >= 18) %>% filter(BMI <= 25) %>% filter(ap_lo<=89) %>%filter(ap_hi<=139)
-df_schlecht_1<-df_1 %>% filter(BMI < 18, ap_lo > 89, ap_hi > 139)
-df_schlecht_2<-df_1 %>% filter(BMI > 25, ap_lo > 89, ap_hi > 139)
-df_schlecht <- rbind(df_schlecht_1,df_schlecht_2)
-nrow(df_schlecht)
-nrow(df_gut)
-head(df_gut)
-
-```
 
 !! fast 4000 weniger Datenpunkte. Evtl macht es hier also sinn die Blutdruck werte aussenvor zu lassen?
 TB Discussed
@@ -170,14 +127,41 @@ summary(glm.model)
 ```
 
 Die folgende Zusammenfassung der Probit Regression wird mit der Funktion $summary$ erzeugt. Besonders wichtig sind hierzu die werte der jeweiligen Koeffizienten sowie der p-Werte der Hypothesentest entgegen der Nullhypothese “der Koeffizient ist gleich 0”. Dies lässt auf die signifikanz des Koeffizienten schließen.\newline
-Die Visualisierung der Prognosen bezüglich der abhängigen Variabel $BMI$ verdeutlichen die unterschiede welche eine Probit Regression im Vergleich zu einer Linearen Regression haben. 
 
 # Plot der Predictions mit Realen daten (Visualiesierung der Prognosed daten)
+
+```{r, message=FALSE}
+#datasets for prediction tutti
+df_predict <- df_1
+prediction_tot <- predict(glm.model, newdata = df_predict, type="response")
+df_predict$prediction <- prediction_tot 
+df_predict
+
+#datasets for prediction gut
+df_gut_predict <- df_gut
+df_gut_predict$cardio <- NULL
+df_gut_predict$id <- NULL
+
+prediction_gut <- predict(glm.model, newdata = df_gut_predict,type="response")
+df_gut_predict$prediction <- prediction_gut 
+
+
+#datasets for prediction schlecht
+df_schlecht_predict <- df_schlecht
+df_schlecht_predict$cardio <- NULL
+df_schlecht_predict$id <- NULL
+
+prediction_schlecht <- predict(glm.model, newdata = df_schlecht_predict,type="response")
+df_schlecht_predict$prediction <- prediction_schlecht
+
+```
+
 ```{r , echo=FALSE}
 ggplot(df_predict, aes(x=BMI , y=cardio)) + xlim(0, 100) + geom_point() + geom_smooth(method = 'glm', method.args = list(family = binomial(link = "probit"))) +ggtitle("Probit Model gegeben der Veränderung des BMI") +ylab("Risiko einer kardiovaskulären Erkrankung")
 
 ```
-                                    
+
+Die Visualisierung der Prognosen bezüglich der abhängigen Variabel $BMI$ verdeutlichen die unterschiede welche eine Probit Regression im Vergleich zu einer Linearen Regression haben.                                     
 
 
 #Methoden: Korrelationspyramide
@@ -204,32 +188,6 @@ ggcorrplot(corr, hc.order = TRUE, type="lower", lab=TRUE)
 
 #Teil 4 Auswertung der Ergebnisse: Auswertung der Regression
 
-
-```{r, echo=FALSE}
-#datasets for prediction tutti
-df_predict <- df_1
-prediction_tot <- predict(glm.model, newdata = df_predict, type="response")
-df_predict$prediction <- prediction_tot 
-df_predict
-
-#datasets for prediction gut
-df_gut_predict <- df_gut
-df_gut_predict$cardio <- NULL
-df_gut_predict$id <- NULL
-
-prediction_gut <- predict(glm.model, newdata = df_gut_predict,type="response")
-df_gut_predict$prediction <- prediction_gut 
-
-
-#datasets for prediction schlecht
-df_schlecht_predict <- df_schlecht
-df_schlecht_predict$cardio <- NULL
-df_schlecht_predict$id <- NULL
-
-prediction_schlecht <- predict(glm.model, newdata = df_schlecht_predict,type="response")
-df_schlecht_predict$prediction <- prediction_schlecht
-
-```
 
 Die $p$-Werte liefern, wie bereits erwähnt, eine Aussage bezüglich der Signifikanz der berechneten $\beta$-Koeffizienten. Intuitiv folgt daraus, dass eine Veränderung in der unabhängigen Variable über die betrachtete unabhängige Variable erklärt werden kann. \newline
 Aus der summary des Models wird sofort ersichtlich, dass jede der gelisteten Variable signifikant zu einem Nivea sind welches kleiner als $\alpha = 0,1\%$ ist. Es lässt sich also schließen, dass zu jeder abhängigen Variable, die Bewegung zur Veränderung des $z$-Wertes führt. \newline
