@@ -1,0 +1,168 @@
+---
+title: "Abschnitt 3"
+output: pdf_document
+---
+
+#Teil 3 Methoden: Probit Regression 
+
+Aufgrund der vorliegenden Erkenntnisse aus der Explorativen Datenanalyse, erscheint es sinnvoll die versteckte Beziehung zwischen den Variablen genauer zu untersuchen und über eine Regression in linearen Zusammenhang zu der Variable $Cardio$ zu stellen. \newline
+Die binäre Variable $Cardio$ liefert nicht die gewünschte Feinheit, durch welche Änderungen in der abhängigen Größe auf die unabhängigen Einflussvariablen zurückgespielt werden können.
+Ohne Einschränkung der Aussagekraft wird daher statt der $Cardio$ Variable, ihr, von den Einflussvariablen, abhängiger Erwartungswert beschrieben. \newline
+Jedoch besteht für die klassische lineare Regression weiterhin große Fehleranfälligkeit. Zum einen führt der beschriebene Lineare Zusammenhang zu erwarteten Wahrscheinlichkeiten die über $1$ liegen und zum anderen sind aus der Vorlesung bekannte Tests zur Genauigkeit der Regression wenig Aussagekräftig.\newline
+Um das erstere Problem zu umgehen findet die Probit Regression Anwendung.
+Hierbei wird der bedingte Erwartungswert der abhängigen Variable über die Verteilungsfunktion der Normalverteilung berechnet. Die Regression modeliert dabei den $z$-Wert, welcher schließlich über den $qnorm$ Befehl zu der erhaltenen Vorhersage $\Phi(z)$ führt. Die hierfür verwendete Formel lautet\footnote{https://www.econometrics-with-r.org/11.2-palr.html}: \par
+
+\begin{equation*}
+P(Y=1|X_1,X_2,...,X_k)= \Phi(\beta_0+\beta_1*X_1+...+\beta_k*X_k)
+\end{equation*}
+
+für das Modell
+
+\begin{equation*}
+Y= \beta_0+\beta_1*X_1+...+\beta_k*X_k+u
+\end{equation*}
+
+Dabei wird angenommen, dass die bedingten Erwartungswerte Normalverteilt sind. Die Unabhängigkeit der Variablen ist durch die Zufällige Probe der Personen gegeben.
+Die Deutung der berechneten Koeffizienten wird intuitiv wenn man die Veränderung des z-Wertes bei isolierter Veränderung der jeweiligen unabhängigen Variable betrachtet. 
+
+```{r, echo=FALSE}
+glm.model <- glm(cardio ~ age+gender+BMI+ap_hi+ap_lo+cholesterol+gluc+smoke+alco+active,family = binomial(link = "probit"),data=df_1, control = list(maxit = 100))
+
+summary(glm.model)
+```
+
+Die folgende Zusammenfassung der Probit Regression wird mit der Funktion $summary$ erzeugt. Besonders wichtig sind hierzu die werte der jeweiligen Koeffizienten sowie der p-Werte der Hypothesentest entgegen der Nullhypothese “der Koeffizient ist gleich 0”. Dies lässt auf die signifikanz des Koeffizienten schließen.\newline
+
+# Plot der Predictions mit Realen daten (Visualiesierung der Prognosed daten)
+
+```{r, message=FALSE}
+#datasets for prediction tutti
+df_predict <- df_1
+prediction_tot <- predict(glm.model, newdata = df_predict, type="response")
+df_predict$prediction <- prediction_tot 
+df_predict
+
+#datasets for prediction gut
+df_gut_predict <- df_gut
+df_gut_predict$cardio <- NULL
+df_gut_predict$id <- NULL
+
+prediction_gut <- predict(glm.model, newdata = df_gut_predict,type="response")
+df_gut_predict$prediction <- prediction_gut 
+
+
+#datasets for prediction schlecht
+df_schlecht_predict <- df_schlecht
+df_schlecht_predict$cardio <- NULL
+df_schlecht_predict$id <- NULL
+
+prediction_schlecht <- predict(glm.model, newdata = df_schlecht_predict,type="response")
+df_schlecht_predict$prediction <- prediction_schlecht
+
+```
+
+```{r , echo=FALSE}
+ggplot(df_predict, aes(x=BMI , y=cardio)) + xlim(0, 100) + geom_point() + geom_smooth(method = 'glm', method.args = list(family = binomial(link = "probit"))) +ggtitle("Probit Model gegeben der Veränderung des BMI") +ylab("Risiko einer kardiovaskulären Erkrankung")
+
+```
+
+Die Visualisierung der Prognosen bezüglich der abhängigen Variabel $BMI$ verdeutlichen die unterschiede welche eine Probit Regression im Vergleich zu einer Linearen Regression haben.                                     
+
+
+#Methoden: Korrelationspyramide
+
+Die folgende Korrelationspyramide zeigt die jeweiligen Korrelationen der untersuchten Variablen auf. Dabei wird besonderes Augenmerk auf die Korrelation der unabhängigen Variablen mit der abhängigen Variablen gesetzt, da diese die Aussagekraft des Models untermalen. Die berechnung und visualisierung übernimmt hierbei das ggcorrplot package \footnote{“https://cran.r-project.org/web/packages/corrplot/index.html”} welches zur Berechnung der Relevanten Werte auf die Funktion $cor.test$ aus dem Packet $stats$ zurückgreift. Die aufgezeigten Werte gleichen entsprechend dem empirischen Korrelationskoeffizienten \footnote{Definition 6.38 aus dem Vorlesungsskript}.
+Mittels eines p.Test werden die Werte in einem weiteren Plot gegen die Nullhypothese $H.0 := Der \,Korrelationskoeffizient \, ist \,gleich \,0$ getestet. Die Werte die hierbei nicht verworfen werden können, sind dabei mit einem $X$ gekennzeichnet.
+
+```{r, echo=FALSE}
+
+corr <- cor(df_1)
+corr
+p.mat <- cor_pmat(df_1)
+
+ggcorrplot(corr, hc.order = TRUE, type="lower", p.mat=p.mat)
+```
+```{r, echo=FALSE}
+library(tidyverse)
+ggcorrplot(corr, hc.order = TRUE, type="lower", lab=TRUE)
+
+
+```
+
+
+
+#Teil 4 Auswertung der Ergebnisse: Auswertung der Regression
+
+
+Die $p$-Werte liefern, wie bereits erwähnt, eine Aussage bezüglich der Signifikanz der berechneten $\beta$-Koeffizienten. Intuitiv folgt daraus, dass eine Veränderung in der unabhängigen Variable über die betrachtete unabhängige Variable erklärt werden kann. \newline
+Aus der summary des Models wird sofort ersichtlich, dass jede der gelisteten Variable signifikant zu einem Nivea sind welches kleiner als $\alpha = 0,1\%$ ist. Es lässt sich also schließen, dass zu jeder abhängigen Variable, die Bewegung zur Veränderung des $z$-Wertes führt. \newline
+Ähnliches lässt sich auch von der Korrelationspyramide ableiten. Hier weist keine Variable eine insignifikante korrelation mit der unabhängigen Variable auf. Auffallend ist dabei, dass die Variablen: $BMI$ und $Cholesterol$ am stärksten mit $Cardio$ korrelieren. Interessant ist auch, dass das Geschlecht ebenfalls einen Einfluss auf das Risiko hat an kardiovaskulären Krankheiten zu erleiden. Dies deckt sich mit der Datenanalyse aus Teil 2 (überprüfen). \par
+
+```{r , echo=FALSE}
+summary(glm.model)$coefficients
+```
+
+
+Um Aussagen über die Genauigkeit des Tests treffen zu können, werden die Erkentnisse der explorativen Datenanalyse genommen und mit den Charakteristiken der geschätzten Werte verglichen. 
+Die Histogramme wurden entsprechen der geschilderten Gruppenaufteilung des Datensets angefertigt und darüber eine ideale Normalverteilung (in blau) gelegt, mit jeweiliger verschiedener Varianzen und Erwartungswerten. Es lässt sich deutlich erkennen, dass die Personen mit schlechter Gesundheit ein höheres Risiko und die mit guter Gesundheit ein niedrigere Risiko aufweisen, zu erkranken. Auch interessant ist, dass eine höhere Menge an Personen in unserem Gesamt Datenset ein niedrigeres Risiko aufweisen. Der Erwartungswert liegt bei  $\sim50\%$.
+
+```{r , echo=FALSE}
+x<-df_predict$prediction
+z <- df_gut_predict$prediction
+b<-df_schlecht_predict$prediction
+h.x<-hist(x, main="Verteilung der Gesamtgruppe", xlab="Risiko zu erkranken", ylab="Anzahl der Personen", ylim=c(0,8000))
+xfit<-seq(min(x),max(x),length=40)
+
+y.xfit<-dnorm(xfit,mean=mean(x),sd=sd(x))
+y.xfit <- y.xfit*diff(h.x$mids[1:2])*length(x)
+lines(xfit, y.xfit, col="blue", lwd=2)
+h.b<-hist(b, main="Verteilung der Gruppe mit schlechter Gesundheit", xlab="Risiko zu erkranken", ylab="Anzahl der Personen",ylim=c(0,2000))
+bfit <- seq(min(b),max(b),length=40)
+y.bfit<-dnorm(bfit,mean=mean(b),sd=sd(b))
+y.bfit <- y.bfit*diff(h.b$mids[1:2])*length(b)
+lines(bfit, y.bfit, col="blue", lwd=2)
+h.z<-hist(z, main="Verteilung der Gruppe mit guter Gesundheit", xlab="Risiko zu erkranken", ylab="Anzahl der Personen")
+zfit <- seq(min(z),max(z),length=40)
+y.zfit<-dnorm(zfit,mean=mean(z),sd=sd(z))
+y.zfit <- y.zfit*diff(h.z$mids[1:2])*length(z)
+lines(zfit, y.zfit, col="blue", lwd=2)
+
+
+```
+
+```{r , echo=FALSE}
+sum(df_1$cardio)/length(df_1$cardio)
+```
+
+
+```{r , echo=FALSE}
+# Compare prediction and real values
+
+mean_tut <- mean(df_1$cardio)
+mean_gut <- mean(df_gut$cardio)
+mean_schlecht <- mean(df_schlecht$cardio)
+mean_pred_tut <- mean(df_predict$prediction)
+mean_pred_gut <- mean(df_gut_predict$prediction)
+mean_pred_schlecht <- mean(df_schlecht_predict$prediction)
+
+```
+
+Die folgende Tabelle veranschaulicht die Abweichung der Prognose von den reellen Daten. Aus der Vorlesung ist bekannt, dass der empirische Mittelwert annähernd Normalverteilt ist, entsprechend läuft der Vergleich nach dem Prinzip des mittleren quadratischen Fehlers mit $n=1$.  \newline
+Es wird ersichtlich, dass das Model die Daten gut erklärt. Lediglich bei der Anwendung des Models auf die Gruppe mit Guter Gesundheit prognostiziert das Model ein grundsätzlich höheres Risiko. 
+
+
+```{r , echo=FALSE}
+Abweichung <- function(x,y){
+  z=(abs(y-x)/x)*100
+  return(z)
+}
+
+compare_df <- data.frame(c("Total","Gut","Schlecht"), c(mean_tut, mean_gut, mean_schlecht),c(mean_pred_tut, mean_pred_gut, mean_pred_schlecht), c(Abweichung(mean_tut,mean_pred_tut),Abweichung(mean_gut,mean_pred_gut),Abweichung(mean_schlecht,mean_pred_schlecht)))
+colnames(compare_df) <- c("Betrachtete Gruppe", "Wahrer Median", "Model Median", "Prozentuale Abweichung")
+
+compare_df
+```
+
+
+
+
