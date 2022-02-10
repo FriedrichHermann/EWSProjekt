@@ -17,7 +17,7 @@ library(magrittr)
 library(ggplot2)
 library(ggthemes)
 library(hrbrthemes)
-
+library(patchwork)
 library(ggpubr)
 
 
@@ -40,22 +40,23 @@ mit der folgenden Struktur
 ```{r}
 str(df_1)
 ```
-Wie in der Einleitung erwähnt, gibt es in diesem Datensatz Variablen bezüglich des Gesundheitsstandes der Patient:innen: 
+Wie in der Einleitung erwähnt, gibt es in diesem Datensatz Variablen bezüglich des **Gesundheitsstandes** der Patient:innen:  
+  
+-age : Alter der Patient:innen in Jahre.  
+-height : Größe der Patient:innen in Meter.  
+-weight : Gewicht in kg.  
+-ap_hi : systolischer Blutdruck in mmHg.  
+-ap_lo : diastolischer Blutdruck in mmHg.  
+-gluc : Glucoselevel im Blut auf einer Skala von 1 bis 3; wobei 1 "normale"   Glucosewerte, 2 "überdurchschnittlich hoch" und 3 "deutlich überdurchschnittlich" beschreibt.  
+-cholesterol : Cholesterollevel im Blut auf einer Skala von 1 bis 3, analog zu gluc.  
+-cardio : Vorliegen einer kardiovaskulären Krankheit in binär: 1 für das Vorliegen einer kardiovaskulären; 0 falls keine kardiovaskuläre Krankheit vorliegt.  
 
--age : Alter der Patient:innen in Jahre.
--height : Größe der Patient:innen in Meter.
--weight : Gewicht in kg.
--ap_hi : systolischer Blutdruck in 
--ap_lo : diastolischer Blutdruck in
--gluc : Glucoselevel im Blut auf einer Skala von 1 bis 3; wobei 1 "normale" Glucosewerte, 2 "überdurchschnittlich hoch" und 3 "deutlich überdurchschnittlich" beschreibt. 
--cholesterol : Cholesterollevel im Blut auf einer Skala von 1 bis 3, analog zu gluc. -cardio : Vorliegen einer kardiovaskulären Krankheit in binär: 1 für das Vorliegen einer kardiovaskulären; 0 falls keine kardiovaskuläre Krankheit vorliegt. 
-
-und bezüglich des Lebenstils der Patient:innen:
-
--smoke : Raucheangewohnheit, 1: der Patient:in Raucht; 0: der Patient:in raucht nicht. 
--alco : Alkoholkonsum, binär wie bei smoke. 
--active : Sportangewohnheit, binär wie bei smoke.
-
+und bezüglich des **Lebensstils** der Patient:innen:  
+  
+-smoke : Raucheangewohnheit, 1: der Patient:in Raucht; 0: der Patient:in raucht nicht.  
+-alco : Alkoholkonsum, binär wie bei smoke.  
+-active : Sportangewohnheit, binär wie bei smoke.  
+  
 Zuerst untersuchen wir, ob unser Datensatz lückenhaft ist
 ```{r}
 
@@ -66,8 +67,8 @@ missing_values <- is.na(df_1)
 sum(missing_values)
 ```
 Es gibt also keine Lücken. 
-
-Folgende Plots dienen der groben Übersicht des Datensatzes: 
+  
+### Folgende Plots dienen der groben Übersicht des Datensatzes: 
 ```{r}
 ggplot(df_1, aes(fill=as.factor(gender))) + geom_bar(aes(x = as.factor(gender)))+ scale_fill_hue(c = 40)  + ylab ("Anzahl") + xlab("Geschlecht")+ labs(title="Geschlechtsverteilung")  +  theme(legend.position="right",axis.title.x=element_blank(),
         axis.text.x=element_blank(),
@@ -82,10 +83,10 @@ b3 <- boxplot(df_1$weight, main = "Gewichtsverteilung", ylab = "Gewicht")
 
 ```
 
-Es handelt sich also überwiegend um Durchschnittlich 53 jährige, überwiegend weibliche Patient:innen.
+Es handelt sich also um Durchschnittlich 53 jährige, überwiegend weibliche Patient:innen.
 
 
-Nun ein Überblick vom Gesundheitsstand der Patient:innen. 
+### Nun ein Überblick vom Gesundheitsstand der Patient:innen. 
 
 
 ```{r}
@@ -100,14 +101,14 @@ beschriftung <- paste(krankheitsstand, prozent, "%", sep = " ")
 p <- pie(prozent, main = "Kranksheitszustand der Patient:innen",labels = beschriftung , col = c("green" , "red"))
 p
 ```
-Es gibt un unserem Datensatz also fast genauso viele kranke, als gesunde Patienten.
+Es gibt in unserem Datensatz also fast genauso viele kranke, als gesunde Patienten.
 
 ```{r}
 ggplot(df_1)+geom_bar(aes(x = cholesterol, fill = as.factor(gender)))+xlab("Cholesterol Level") + ylab ("Anzahl") + labs(title="Cholesterol Profil der Patient:innen")  +facet_grid(facets = df_1$gender) + theme_clean()+ scale_fill_discrete(name = "Geschlecht", labels = as.factor(c("F", "M"))) 
 ```
 
 Nun interessieren wir uns für die Einflussvariablen auf die kardiovaskuläre Gesundheit der Patient:innen. 
-Wir filtern die Patient:innen heraus, desseren Blutdruckwerte und BMI unrealistisch sind.
+Wir filtern die Patient:innen heraus, deren Blutdruckwerte und BMI unrealistisch sind.
 
 ```{r}
 df_1_plot <- filter(df_1, ap_lo < 250,ap_lo > 20, ap_hi < 250,ap_hi > 20, BMI < 100) #hier habe ich die Patienten rausgefiltert, die für die Analyse entweder zu hohe/zu niedrige Blutdruckwerte/BMI haben
@@ -136,10 +137,10 @@ Man sieht anhand des Plot und der Tabellen, dass die kranken Patienten nur einen
 
 Untersuchung der Blutdruckwerte: 
 
-Wir führen die Sprechweise ein: 
-
-"guter Blutdruck" : ap_hi <= 139 und ap_lo <= 89
-"schlechter Blutdruck": ap_hi >= 140 oder ap_lo >= 90 dabei basieren wir uns auf der schweizerischen Herzstiftung.
+Wir definieren: \\
+\\
+"guter Blutdruck" : ap_hi <= 139 und ap_lo <= 89 \\
+"schlechter Blutdruck": ap_hi >= 140 oder ap_lo >= 90 dabei basieren wir uns auf der schweizerischen Herzstiftung. \\
 
 ```{r}
 p <- ggplot(df_1_plot, aes(x = ap_lo , y = ap_hi )) + geom_point(aes(color = ifelse(cardio == 0 , 'green' ,'red'))) + scale_colour_manual(labels = c("0","1"), values = c('green','red')) +
@@ -227,7 +228,7 @@ pcs
 
 Nun die Glucosewerte:
 ```{r}
-
+par(mfrow = c(3,1))
 #Zuerst die Patienten mit guten Glucwerten
 tgg <- table(g_glucwerte$cardio)
 tgg <- (tgg/sum(tgg))*100
@@ -237,8 +238,8 @@ prozent <- round(tgg)
 krankheitsstand <- c("gesund","krank")
 
 beschriftung <- paste(krankheitsstand, prozent, "%", sep = " ")
-pgg <- pie(prozent, main = "Kranksheitszustand der Patient:innen mit guten Glucosewerten",labels = beschriftung , col = c("green" , "red"))
-pgg
+pgg <- pie(prozent, main = "Krankheitszusatnd der Patient:innen mit guten Glucwerten",labels = beschriftung , col = c("green" , "red"))
+
 
 #Danach die Patienten mit mittelguten Glucwerten
 tgm <- table(m_glucwerte$cardio)
@@ -250,7 +251,7 @@ krankheitsstand <- c("gesund","krank")
 
 beschriftung <- paste(krankheitsstand, prozent, "%", sep = " ")
 pgm <- pie(prozent, main = "Kranksheitszustand der Patient:innen mit mittelguten Glucosewerten",labels = beschriftung , col = c("green" , "red"))
-pgm
+
 
 #Schließlich die Patienten mit schlechten Glucwerten
 tgs <- table(s_glucwerte$cardio)
@@ -262,7 +263,8 @@ krankheitsstand <- c("gesund","krank")
 
 beschriftung <- paste(krankheitsstand, prozent, "%", sep = " ")
 pgs <- pie(prozent, main = "Kranksheitszustand der Patient:innen mit schlechten Glucosewerten",labels = beschriftung , col = c("green" , "red"))
-pgs
+
+
 ```
 
 
