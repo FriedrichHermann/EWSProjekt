@@ -29,6 +29,29 @@ df_schlecht_2<-df_1 %>% filter(BMI > 25, ap_lo > 89, ap_hi > 139)
 df_schlecht <- rbind(df_schlecht_1,df_schlecht_2)
 ```
 
+
+Wir betrachten das statistische Modell
+
+$(\Omega = \{1,\dots,2831\},\ \cal{F} = \cal{P}(\Omega),\ (P_\theta = Binomial(2831,\theta))_{\theta\in\Theta})$
+
+zum Testproblem:  $H_0 : \theta \leq 0.4997 ,\  H_1: \theta > 0.4997$
+
+Ein gleichmäßig bester Test ist nach der Vorlesung der Form : $D(x) = 1_{K}(x) \ mit \  K = \{c,\dots,2831\}\ der \ Ablehnungsbereich. $
+
+Der R-Befehl 
+```{r}
+qbinom(0.01, size = 2831, prob = 0.4997, lower.tail = FALSE)
+```
+Damit ist $K = \{1477, ... , 2831\}$ der Ablehnungsbereich des Test zum Signifikanzniveau $1\%$. 
+
+Wir haben
+```{r}
+sum(ungesund$cardio)
+```
+Damit ist die Nullhypothese (bei weitem) verworfen. 
+
+
+
 #Teil 3 Methoden: Probit Regression 
 
 Aufgrund der vorliegenden Erkenntnisse aus der Explorativen Datenanalyse, erscheint es sinnvoll die versteckte Beziehung zwischen den Variablen genauer zu untersuchen und über eine Regression in linearen Zusammenhang zu der Variable $Cardio$ zu stellen. \newline
