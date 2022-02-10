@@ -1,0 +1,42 @@
+---
+title: "Abschnitt 4"
+output: pdf_document
+---
+
+#Teil 4 Auswertung der Ergebnisse: Auswertung der Regression
+
+Die $p$-Werte liefern, wie bereits erwähnt, eine Aussage bezüglich der Signifikanz der berechneten $\beta$-Koeffizienten. Intuitiv folgt daraus, dass eine Veränderung in der unabhängigen Variable über die betrachtete unabhängige Variable erklärt werden kann. \newline
+Aus der summary des Models wird sofort ersichtlich, dass jede der gelisteten Variable signifikant zu einem Nivea sind welches kleiner als $\alpha = 0,1\%$ ist. Es lässt sich also schließen, dass zu jeder abhängigen Variable, die Bewegung zur Veränderung des $z$-Wertes führt. \newline
+Ähnliches lässt sich auch von der Korrelationspyramide ableiten. Hier weist keine Variable eine insignifikante korrelation mit der unabhängigen Variable auf. Auffallend ist dabei, dass die Variablen: $BMI$ und $Cholesterol$ am stärksten mit $Cardio$ korrelieren. Interessant ist auch, dass das Geschlecht ebenfalls einen Einfluss auf das Risiko hat an kardiovaskulären Krankheiten zu erleiden. Dies deckt sich mit der Datenanalyse aus Teil 2 (überprüfen). \par
+
+```{r , echo=FALSE}
+summary(glm.model)$coefficients
+```
+
+
+Um Aussagen über die Genauigkeit des Tests treffen zu können, werden die Erkentnisse der explorativen Datenanalyse genommen und mit den Charakteristiken der geschätzten Werte verglichen. 
+Die Histogramme wurden entsprechen der geschilderten Gruppenaufteilung des Datensets angefertigt und darüber eine ideale Normalverteilung (in blau) gelegt, mit jeweiliger verschiedener Varianzen und Erwartungswerten. Es lässt sich deutlich erkennen, dass die Personen mit schlechter Gesundheit ein höheres Risiko und die mit guter Gesundheit ein niedrigere Risiko aufweisen, zu erkranken. Auch interessant ist, dass eine höhere Menge an Personen in unserem Gesamt Datenset ein niedrigeres Risiko aufweisen. Der Erwartungswert liegt bei  $\sim50\%$.
+
+```{r , echo=FALSE}
+x<-df_predict$prediction
+z <- df_gut_predict$prediction
+b<-df_schlecht_predict$prediction
+h.x<-hist(x, main="Verteilung der Gesamtgruppe", xlab="Risiko zu erkranken", ylab="Anzahl der Personen", ylim=c(0,8000))
+xfit<-seq(min(x),max(x),length=40)
+
+y.xfit<-dnorm(xfit,mean=mean(x),sd=sd(x))
+y.xfit <- y.xfit*diff(h.x$mids[1:2])*length(x)
+lines(xfit, y.xfit, col="blue", lwd=2)
+h.b<-hist(b, main="Verteilung der Gruppe mit schlechter Gesundheit", xlab="Risiko zu erkranken", ylab="Anzahl der Personen",ylim=c(0,2000))
+bfit <- seq(min(b),max(b),length=40)
+y.bfit<-dnorm(bfit,mean=mean(b),sd=sd(b))
+y.bfit <- y.bfit*diff(h.b$mids[1:2])*length(b)
+lines(bfit, y.bfit, col="blue", lwd=2)
+h.z<-hist(z, main="Verteilung der Gruppe mit guter Gesundheit", xlab="Risiko zu erkranken", ylab="Anzahl der Personen")
+zfit <- seq(min(z),max(z),length=40)
+y.zfit<-dnorm(zfit,mean=mean(z),sd=sd(z))
+y.zfit <- y.zfit*diff(h.z$mids[1:2])*length(z)
+lines(zfit, y.zfit, col="blue", lwd=2)
+
+
+```

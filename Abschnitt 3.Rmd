@@ -2,14 +2,15 @@
 title: "Abschnitt 3"
 output: pdf_document
 ---
-```{r}
+```{r, include=FALSE}
+library(tidyverse)
 library(ggcorrplot)
 library(dplyr)
 library(ggplot2)
 library(gridExtra)
 ```
 
-```{r}
+```{r, include=FALSE}
 df_1 <-read.csv("cardio_train.csv", sep=";")
 df_1$age <- df_1$age/365
 df_1$height <- df_1$height/100
@@ -19,33 +20,15 @@ df_1$weight <- NULL
 head(df_1)
 ```
 
-Schritt 2 - Untersuchen der Gruppierungen
 
-
-
-Gruppe 1 (Gute Gesundheit) 
-- BMI 18 bis 25
-ap_lo <80
-ap_hi <130
-
-
-Gruppe 2 (Übergewicht/ Untergewicht und Bluthochdruck):
-- BMI >25
-- BMI <18
-- ap_lo >80
-- ap_hi >130
-
-```{r}
+```{r, include=FALSE}
 df_1$id <- NULL
 df_gut<-df_1 %>% filter(BMI >= 18) %>% filter(BMI <= 25) %>% filter(ap_lo<=89) %>%filter(ap_hi<=139)
 df_schlecht_1<-df_1 %>% filter(BMI < 18, ap_lo > 89, ap_hi > 139)
 df_schlecht_2<-df_1 %>% filter(BMI > 25, ap_lo > 89, ap_hi > 139)
 df_schlecht <- rbind(df_schlecht_1,df_schlecht_2)
-nrow(df_schlecht)
-nrow(df_gut)
-head(df_gut)
-
 ```
+
 #Teil 3 Methoden: Probit Regression 
 
 Aufgrund der vorliegenden Erkenntnisse aus der Explorativen Datenanalyse, erscheint es sinnvoll die versteckte Beziehung zwischen den Variablen genauer zu untersuchen und über eine Regression in linearen Zusammenhang zu der Variable $Cardio$ zu stellen. \newline
@@ -78,7 +61,7 @@ Die folgende Zusammenfassung der Probit Regression wird mit der Funktion $summar
 
 # Plot der Predictions mit Realen daten (Visualiesierung der Prognosed daten)
 
-```{r, message=FALSE}
+```{r, include=FALSE}
 #datasets for prediction tutti
 df_predict <- df_1
 prediction_tot <- predict(glm.model, newdata = df_predict, type="response")
@@ -104,7 +87,7 @@ df_schlecht_predict$prediction <- prediction_schlecht
 
 ```
 
-```{r , echo=FALSE}
+```{r , echo=FALSE, warning=FALSE, message=FALSE}
 ggplot(df_predict, aes(x=BMI , y=cardio)) + xlim(0, 100) + geom_point() + geom_smooth(method = 'glm', method.args = list(family = binomial(link = "probit"))) +ggtitle("Probit Model gegeben der Veränderung des BMI") +ylab("Risiko einer kardiovaskulären Erkrankung")
 
 ```
@@ -120,60 +103,17 @@ Mittels eines p.Test werden die Werte in einem weiteren Plot gegen die Nullhypot
 ```{r, echo=FALSE}
 
 corr <- cor(df_1)
-corr
 p.mat <- cor_pmat(df_1)
 
 ggcorrplot(corr, hc.order = TRUE, type="lower", p.mat=p.mat)
 ```
 ```{r, echo=FALSE}
-library(tidyverse)
 ggcorrplot(corr, hc.order = TRUE, type="lower", lab=TRUE)
-
-
 ```
 
 
-#Teil 4 Auswertung der Ergebnisse: Auswertung der Regression
-
-Die $p$-Werte liefern, wie bereits erwähnt, eine Aussage bezüglich der Signifikanz der berechneten $\beta$-Koeffizienten. Intuitiv folgt daraus, dass eine Veränderung in der unabhängigen Variable über die betrachtete unabhängige Variable erklärt werden kann. \newline
-Aus der summary des Models wird sofort ersichtlich, dass jede der gelisteten Variable signifikant zu einem Nivea sind welches kleiner als $\alpha = 0,1\%$ ist. Es lässt sich also schließen, dass zu jeder abhängigen Variable, die Bewegung zur Veränderung des $z$-Wertes führt. \newline
-Ähnliches lässt sich auch von der Korrelationspyramide ableiten. Hier weist keine Variable eine insignifikante korrelation mit der unabhängigen Variable auf. Auffallend ist dabei, dass die Variablen: $BMI$ und $Cholesterol$ am stärksten mit $Cardio$ korrelieren. Interessant ist auch, dass das Geschlecht ebenfalls einen Einfluss auf das Risiko hat an kardiovaskulären Krankheiten zu erleiden. Dies deckt sich mit der Datenanalyse aus Teil 2 (überprüfen). \par
-
-```{r , echo=FALSE}
-summary(glm.model)$coefficients
-```
 
 
-Um Aussagen über die Genauigkeit des Tests treffen zu können, werden die Erkentnisse der explorativen Datenanalyse genommen und mit den Charakteristiken der geschätzten Werte verglichen. 
-Die Histogramme wurden entsprechen der geschilderten Gruppenaufteilung des Datensets angefertigt und darüber eine ideale Normalverteilung (in blau) gelegt, mit jeweiliger verschiedener Varianzen und Erwartungswerten. Es lässt sich deutlich erkennen, dass die Personen mit schlechter Gesundheit ein höheres Risiko und die mit guter Gesundheit ein niedrigere Risiko aufweisen, zu erkranken. Auch interessant ist, dass eine höhere Menge an Personen in unserem Gesamt Datenset ein niedrigeres Risiko aufweisen. Der Erwartungswert liegt bei  $\sim50\%$.
-
-```{r , echo=FALSE}
-x<-df_predict$prediction
-z <- df_gut_predict$prediction
-b<-df_schlecht_predict$prediction
-h.x<-hist(x, main="Verteilung der Gesamtgruppe", xlab="Risiko zu erkranken", ylab="Anzahl der Personen", ylim=c(0,8000))
-xfit<-seq(min(x),max(x),length=40)
-
-y.xfit<-dnorm(xfit,mean=mean(x),sd=sd(x))
-y.xfit <- y.xfit*diff(h.x$mids[1:2])*length(x)
-lines(xfit, y.xfit, col="blue", lwd=2)
-h.b<-hist(b, main="Verteilung der Gruppe mit schlechter Gesundheit", xlab="Risiko zu erkranken", ylab="Anzahl der Personen",ylim=c(0,2000))
-bfit <- seq(min(b),max(b),length=40)
-y.bfit<-dnorm(bfit,mean=mean(b),sd=sd(b))
-y.bfit <- y.bfit*diff(h.b$mids[1:2])*length(b)
-lines(bfit, y.bfit, col="blue", lwd=2)
-h.z<-hist(z, main="Verteilung der Gruppe mit guter Gesundheit", xlab="Risiko zu erkranken", ylab="Anzahl der Personen")
-zfit <- seq(min(z),max(z),length=40)
-y.zfit<-dnorm(zfit,mean=mean(z),sd=sd(z))
-y.zfit <- y.zfit*diff(h.z$mids[1:2])*length(z)
-lines(zfit, y.zfit, col="blue", lwd=2)
-
-
-```
-
-```{r , echo=FALSE}
-sum(df_1$cardio)/length(df_1$cardio)
-```
 
 
 ```{r , echo=FALSE}
