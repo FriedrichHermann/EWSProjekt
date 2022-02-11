@@ -40,7 +40,7 @@ $(\Omega = \{1,\dots,11753\},\ \cal{F} = \cal{P}(\Omega),\ (P_\theta = Binomial(
 
 zum Testproblem:  $H_0 : \theta \leq 0.4997 ,\  H_1: \theta > 0.4997$ \newline
 
-Ein gleichmäßig bester Test ist von der Form : $D(x) = 1_{K}(x) \ mit \  K = \{c,\dots,11753\}\ der \ Ablehnungsbereich. $\footnote{Vorlesungsskript} \Newline
+Ein gleichmäßig bester Test ist von der Form : $D(x) = 1_{K}(x) \ mit \  K = \{c,\dots,11753\}\ der \ Ablehnungsbereich.$ \footnote{Vorlesungsskript} \newline
 
 Der R-Befehl
 ```{r}
@@ -48,8 +48,8 @@ qbinom(0.01, size = 11753, prob = 0.4997, lower.tail = FALSE)
 ```
 Damit ist $K = \{5999, ... , 11753\}$ der Ablehnungsbereich des Test zum Signifikanzniveau $1\%$. 
 
-Wir haben
-```{r}
+Die Anzahl der Herzkranken in der Gruppe mit schlechter Gesundheit beträgt
+```{r, echo=FALSE}
 sum(df_schlecht$cardio)
 ```
 Damit ist die Nullhypothese (bei weitem) verworfen. 
@@ -63,7 +63,7 @@ Die binäre Variable $Cardio$ liefert nicht die gewünschte Feinheit, durch welc
 Ohne Einschränkung der Aussagekraft wird daher statt der $Cardio$ Variable, ihr, von den Einflussvariablen, abhängiger Erwartungswert beschrieben. \newline
 Jedoch besteht für die klassische lineare Regression weiterhin große Fehleranfälligkeit. Zum einen führt der beschriebene Lineare Zusammenhang zu erwarteten Wahrscheinlichkeiten die über $1$ liegen und zum anderen sind aus der Vorlesung bekannte Tests zur Genauigkeit der Regression wenig Aussagekräftig.\newline
 Um das erstere Problem zu umgehen findet die Probit Regression Anwendung.
-Hierbei wird der bedingte Erwartungswert der abhängigen Variable über die Verteilungsfunktion der Normalverteilung berechnet. Die Regression modeliert dabei den $z$-Wert, welcher schließlich über den $qnorm$ Befehl zu der erhaltenen Vorhersage $\Phi(z)$ führt. Die hierfür verwendete Formel lautet\footnote{https://www.econometrics-with-r.org/11.2-palr.html}: \par
+Hierbei wird der bedingte Erwartungswert der abhängigen Variable über die Verteilungsfunktion der Normalverteilung berechnet. Die Regression modeliert dabei den $z$-Wert, welcher schließlich über den $qnorm$ Befehl zu der erhaltenen Vorhersage $\Phi(z)$ führt. Die hierfür verwendete Formel lautet \footnote{https://www.econometrics-with-r.org/11.2-palr.html}: \par
 
 \begin{equation*}
 P(Y=1|X_1,X_2,...,X_k)= \Phi(\beta_0+\beta_1*X_1+...+\beta_k*X_k)
