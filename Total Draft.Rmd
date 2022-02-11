@@ -1,0 +1,704 @@
+---
+title: "Total Draft"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+\pagenumbering{Roman}
+
+\begin{titlepage}
+   \begin{center}
+       \vspace*{1.5cm}
+       \Huge
+       \textbf{R-Projekt}
+       
+       \vspace{1.5cm}
+       \huge
+       Eine Datenanalyse bezüglich kardiovaskulärer Erkrankungen
+       \vspace{2cm}
+       
+       \Large
+       Einführung in die Wahrscheinlichkeitstheorie und Statistik [MA0009]
+       \vspace{1.5mm}
+       
+       \Large
+       Prof. Dr. Silke Rolles
+       \vspace{1.5mm}
+       
+       \Large
+       Stephan Haug
+       \vspace{1.5mm}
+       
+       \Large
+       München, 12. Februar, 2022
+       
+       \vfill
+       \Large
+       \textbf{Axha, Frenkli} \newline
+       \textbf{Grünewald, Mathis A.} \newline
+       \textbf{Hermann, Friedrich K.} \newline
+       \vspace{1.5mm}
+       
+     
+   \end{center}
+\end{titlepage}
+
+# 1. Einleitung
+Die folgende Analyse des vorliegenden Datensatzes dient der Untersuchung des Einflusses verschiedener Faktoren, im Zusammenhang mit dem individuellen Lebensstil einer Person, auf die Entwicklung einer kardiovaskulären Krankheit. \newline
+Dazu werden die Daten des Datensatzes cardio_train untersucht, der Variablen bezüglich des Gesundheitsstandes, des Lebenstils und des Vorliegens einer kardiovaskulären Krankheit von 70000 Patient:innen enthält. Der Datensatz wurde von Kaggle \footnote{https://www.kaggle.com/abdallahmahmoud/cardiovascular-disease-prediction-73-59-accuracy} bereitgestellt.\newline
+Hier ein Überblick der, mit der Variable BMI erweiterten, Variablen des Datensatzes: 
+
+```{r, echo=FALSE}
+df_1 <-read.csv("cardio_train.csv", sep=";")
+df_1$age <- df_1$age/365
+df_1$height <- df_1$height/100
+df_1 <- cbind(df_1 , "BMI" = (df_1$weight)/(df_1$height)^2 )
+head(df_1)
+```
+
+Einerseits enthält der Datensatz Variablen bezüglich des Gesundheitsstandes der Patient:innen:\newline
+\newline
+-age : Alter der Patient:innen in Jahre.\newline
+-height : Größe der Patient:innen in Meter.\newline 
+-weight : Gewicht in kg.\newline
+-ap_hi : systolischer Blutdruck in mmHg.\newline
+-ap_lo : diastolischer Blutdruck in mmHg.\newline 
+-gluc : Glucoselevel im Blut auf einer Skala von 1 bis 3; wobei 1 "normale" Glucosewerte, 2 "mittelgute" Glucosewerte und 3 "schlechte" Glucosewerte beschreibt.\newline
+-cholesterol : Cholesterollevel im Blut auf einer Skala von 1 bis 3, analog zu gluc.\newline  
+-cardio : Vorliegen einer kardiovaskulären Krankheit in binär: 1 für das Vorliegen einer kardiovaskulären; 0 falls keine kardiovaskuläre Krankheit vorliegt. Dies ist die Zielvariable, die näher untersucht werden wird.\newline 
+\newline
+Andererseits enthält er Variablen bezüglich des Lebensstils der Patient:innen:  
+\newline
+-smoke : Raucheangewohnheit, 1: der Patient:in Raucht; 0: der Patient:in raucht nicht.\newline
+-alco : Alkoholkonsum, binär wie bei smoke.\newline
+-active : Sportangewohnheit, binär wie bei smoke.\newline
+\newline
+Unsere Absicht ist es zu untersuchen, ob der Gesundheitsstand einen Einfluss auf das Vorliegen einer kardiovaskulären Krankheit hat; und wiederum, ob der Lebensstil einen Einfluss auf den Gesundheitsstand hat. 
+
+
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, echo = FALSE, message=FALSE, include=FALSE}
+
+library(tidyverse)
+library(dplyr)
+library(data.table)
+library(magrittr)
+library(ggplot2)
+library(ggthemes)
+library(hrbrthemes)
+library(patchwork)
+library(ggpubr)
+library(gridExtra)
+df_1 <-read.csv("cardio_train.csv", sep=";")
+df_1$age <- df_1$age/365
+df_1$height <- df_1$height/100
+df_1 <- cbind(df_1 , "BMI" = (df_1$weight)/(df_1$height)^2 )
+
+```
+
+\newpage
+
+# 2. Explorative Datenanalyse
+Der folgende Abschnitt dient zur Einführung in den vorliegenden Datensatz. Dabei wird dem Leser ein grober Überblick der Gesamtstruktur des Datensatzes gegeben und im späteren Verlauf genauere Charakteristiken bezüglich der Variablen die in der späteren Analyse noch von größerer Bedeutung sind.
+
+  
+## Übersicht des Datensatzes und Struktur
+
+```{r, echo = FALSE}
+summary(object = df_1)
+```
+
+mit der Struktur
+
+```{r, echo = FALSE}
+str(df_1)
+```
+
+Zuerst untersuchen wir, ob unser Datensatz lückenhaft ist
+
+```{r}
+
+number_of_columns <- ncol(df_1)
+number_of_lines <- nrow(df_1)  
+missing_values <- is.na(df_1)
+
+sum(missing_values)
+```
+
+Ein Überblick über die Patient:innen liefert  
+
+```{r, echo = FALSE, out.width="55%"}
+par(mfrow = c(1,2))
+
+ggplot(df_1, aes(fill=as.factor(gender))) + geom_bar(aes(x = as.factor(gender)))+ scale_fill_hue(c = 40)  + ylab ("Anzahl") + xlab("Geschlecht")+ labs(title="Geschlechtsverteilung")  +  theme(legend.position="right",axis.title.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank())+ scale_fill_discrete(name = "Geschlecht", labels = c("F", "M"))+ theme_clean()
+
+par(mfrow = c(1,3))
+b1 <- boxplot(df_1$age, main = "Altersverteilung", ylab = "Alter")
+b3 <- boxplot(df_1$weight, main = "Gewichtsverteilung", ylab = "Gewicht")
+b2 <- boxplot(df_1$height, main = "Größeverteilung", ylab = "Größe")
+
+```
+
+
+
+
+Es handelt sich also um Durchschnittlich 53 jährige, überwiegend weibliche Patient:innen.
+Dies erklärt auch, weshalb die mittlere Größe "nur" 1,64m ist. 
+
+## Nun ein Überblick vom Gesundheitsstand der Patient:innen
+
+
+```{r, echo = FALSE, out.width="50%"}
+t <- table(df_1$cardio)
+t <- (t/sum(t))*100
+
+prozent <- round(t,2)
+
+krankheitsstand <- c("gesund","krank")
+
+beschriftung <- paste(krankheitsstand, prozent, "%", sep = " ")
+pie(prozent, main = "Kranksheitszustand der Patient:innen",labels = beschriftung , col = c("green" , "red"))
+
+```
+
+Es gibt in unserem Datensatz also fast genauso viele kranke, wie gesunde Patienten.
+
+### Untersuchung der Blutwerte ergibt
+
+```{r, echo = FALSE, out.width="75%"}
+
+p1 <- ggplot(df_1)+geom_bar(aes(x = cholesterol, fill = as.factor(gender)))+xlab("Cholesterol Level") + ylab ("Anzahl") + labs(title="Cholesterol Profil der Patient:innen")  +facet_grid(facets = df_1$gender) + theme_clean()+ scale_fill_discrete(name = "Geschlecht", labels = as.factor(c("F", "M"))) 
+
+p2 <- ggplot(df_1)+geom_bar(aes(x = gluc, fill = as.factor(gender)))+xlab("Cholesterol Level") + ylab ("Anzahl") + labs(title="Glucose Profil der Patient:innen")  +facet_grid(facets = df_1$gender) + theme_clean()+ scale_fill_discrete(name = "Geschlecht", labels = as.factor(c("F", "M"))) 
+ggarrange(p1,p2,ncol = 1)
+```
+
+Man erkennt an dem Plot, dass die Mehrheit der Patient:innen - sowohl die männlichen
+als auch weiblichen - gute Glucose- und Cholesterolwerte hat.\newline 
+Einen genaueren Einblick lieferen beide folgenden Plots.
+
+```{r, echo=FALSE,, out.width="50%"}
+par(mfrow=c(1,2))
+
+agebreaks <- c(0,1,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,500)
+agelabels <- c("0-1","1-4","5-9","10-14","15-19","20-24","25-29","30-34",
+               "35-39","40-44","45-49","50-54","55-59","60-64","65-69",
+               "70-74","75-79","80-84","85+")
+
+setDT(df_1)[ , agegroups := cut(age, 
+                                breaks = agebreaks, 
+                                right = FALSE, 
+                                labels = agelabels)]
+plot<- df_1%>%
+    group_by(gluc)%>%
+    count(agegroups)
+
+ggplot(plot, aes(y =n, x = as.factor(gluc)))+ geom_bar(stat='identity', aes(fill = as.factor(gluc)))+ facet_wrap(facets = plot$agegroups, scales="free_y")+xlab("Glucosewerte ") + ylab ("Anzahl") + labs(title="Glucose für die Altersgruppe")+ scale_fill_discrete(name = "gluc", labels = as.factor(c("gut", "mittelgut", "schlecht")))
+
+agebreaks <- c(0,1,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,500)
+agelabels <- c("0-1","1-4","5-9","10-14","15-19","20-24","25-29","30-34",
+               "35-39","40-44","45-49","50-54","55-59","60-64","65-69",
+               "70-74","75-79","80-84","85+")
+
+setDT(df_1)[ , agegroups := cut(age, 
+                                breaks = agebreaks, 
+                                right = FALSE, 
+                                labels = agelabels)]
+plot<- df_1%>%
+    group_by(cholesterol)%>%
+    count(agegroups)
+
+ggplot(plot, aes(y =n, x = as.factor(cholesterol)))+ geom_bar(stat='identity', aes(fill = as.factor(cholesterol)))+ facet_wrap(facets = plot$agegroups, scales="free_y")+xlab("Cholesterolwerte") + ylab ("Anzahl") + labs(title="Cholesterollevel für die Altersgruppe")+ scale_fill_discrete(name = "gluc", labels = as.factor(c("gute", "mittelgute", "schlechte")))
+```
+```{r, echo=FALSE,, out.width="50%"}
+
+
+```
+
+Hier erkennt man ganz klar, dass die Blutwertqualität mit dem alter abnimmt. Je älter die Patient:innen, umso größer ist der Anteil an Patient:innen mit mittelguten und schlechten Glucose bzw. Cholesterolwerten. \newline
+
+Dies gibt uns Anlass zur explorativen Suche nach Einflussvariablen für das Auftreten von kardiovaskulären Krankheiten. 
+
+### Suche nach Einflussvariablen auf das Auftreten von kardiovaskulären Krankheiten:  
+
+Wir filtern die Patient:innen heraus, deren Blutdruckwerte und BMI unrealistisch sind, und erhalten das BMI Profil
+
+```{r, echo = FALSE}
+df_1_plot <- filter(df_1, ap_lo < 250,ap_lo > 20, ap_hi < 250,ap_hi > 20, BMI < 100) #hier habe ich die Patienten rausgefiltert, die für die Analyse entweder zu hohe/zu niedrige Blutdruckwerte/BMI haben
+```
+
+
+```{r, echo = FALSE, out.width="75%"}
+
+p <- ggplot(df_1_plot, aes(cardio,BMI)) + geom_boxplot(aes(color = ifelse(cardio == 0 , 'green' ,'red'))) + scale_colour_manual(labels = c("0","1"), values = c('green','red')) + labs(color = 'Krankheit', title = 'BMI-Profil der Patienten') + theme( aspect.ratio = 1.5)
+p
+```
+
+BMI Mittelwert der gesunden Patient:innen:
+
+```{r, echo = FALSE}
+
+df_krank <- filter(df_1_plot , cardio == 1)
+df_gesund <- filter(df_1_plot ,cardio == 0)
+
+summary(df_gesund$BMI)
+```
+
+BMI-Mittelwert der kranken Patient:innen: 
+
+```{r, echo = FALSE}
+summary(df_krank$BMI)
+```
+
+Man sieht anhand des Plot und der Tabellen, dass die kranken Patienten nur einen leicht höheren BMI vorweisen, als die gesunden. Entsprechend 26.483 und 28.473 im Mittel. Vermutlich hat die Variable $BMI$ keinen erheblichen Einfluss, da sich hier keinen klaren Trend ablesen lässt. Genaueres wird im Abschnitt 3 und 4 untersucht. Jedoch gilt ein:e Patient:in ab einem BMI von 25 als übergewichtig, also haben sowohl die gesunden als auch die kranken Patient:innen einen zu hohen BMI. \newline
+
+Untersuchung der Blutdruckwerte: \newline
+
+Wir definieren:\newline
+\newline
+"guter Blutdruck" : ap_hi $\leq$ 139 und ap_lo $\leq$ 89 \newline
+"schlechter Blutdruck": ap_hi $\geq$ 140 oder ap_lo $\geq$ 90 dabei basieren wir uns auf der schweizerischen Herzstiftung\footnote{https://www.swissheart.ch/herzkrankheiten-hirnschlag/risikofaktoren/blutdruck/was-ist-bluthochdruck.html}. 
+
+```{r, echo = FALSE}
+p <- ggplot(df_1_plot, aes(x = ap_lo , y = ap_hi )) + geom_point(aes(color = ifelse(cardio == 0 , 'green' ,'red'))) + scale_colour_manual(labels = c("0","1"), values = c('green','red')) +
+ labs(color = "Krankheit")
+
+p + geom_segment(aes(x = 20, y = 139 , xend = 89 ,yend = 139)) + geom_segment(aes(x = 89, y = 20 , xend = 89 ,yend = 139)) + geom_segment(aes(x = 20, y = 20 , xend = 89 ,yend = 20)) + geom_segment(aes(x = 20, y = 20 , xend = 20 ,yend = 139)) + labs(title = "Blutdruck-Profil der Patienten") #hier habe ich zwei Segmente im Plot eingezeichnet, um die Gruppe mit niedrigem Blutdruck von der Gruppe mit hohem Blutdruck graphisch zu unterscheiden. 
+```
+
+Krankheitsrate in der Gruppe mit gutem Blutdruck
+
+```{r, echo = FALSE}
+g_blutdruck <- filter(df_1_plot , ap_hi < 140 , ap_lo < 90)
+mean(g_blutdruck$cardio)
+```
+
+Krankheitsrate in der Gruppe mit schlechtem Blutdruck
+
+```{r, echo = FALSE}
+s_blutdruck <- filter(df_1_plot, ap_hi >= 140 | ap_lo >=  90) 
+mean(s_blutdruck$cardio)
+```
+
+Im Plot befindet sich innerhalb des Quadrats die Gruppe an Patienten:innen, die gute Blutdruckwerte haben und außerhalb des Quadrats die, der Patient:innen mit schlechten Blutdruckwerten. Graphisch erkennt man, dass sich innerhalb des Quadrats eher mehr grüne Punkte befinden als rote; und außerhalb des Quadrats andersherum - was durch die Krankheitsraten in den jeweiligen Gruppen bestätigt wird. \newpage
+
+
+Im folgenden haben wir die Patient:innen, für die Variablen $cholesterol$ und $gluc$, in drei Gruppen je nach Blutwerten aufgeteilt und jeweils den Anteil an kranken und gesunden Patient:innen untersucht.
+
+```{r, echo = FALSE , message=FALSE}
+gesunde <- filter(df_1, cardio == 0)
+kranke <- filter(df_1, cardio == 1) 
+
+g_cholwerte <- filter(df_1, cholesterol == 1) #g_ für gute , m_ für mittelgute , s_ für schlechte Werte
+m_cholwerte <- filter(df_1, cholesterol == 2)
+s_cholwerte <- filter(df_1, cholesterol == 3)
+
+g_glucwerte <- filter(df_1 , gluc == 1)
+m_glucwerte <- filter(df_1 , gluc == 2)
+s_glucwerte <- filter(df_1 , gluc == 3)
+
+```
+
+Für die Variable $cholesterol$:
+
+```{r, echo = FALSE}
+par(mfrow = c(1,3))
+#Zuerst die Patienten mit guten Cholwerten
+tcg <- table(g_cholwerte$cardio)
+tcg <- (tcg/sum(tcg))*100
+
+prozent <- round(tcg)
+
+krankheitsstand <- c("gesund","krank")
+
+beschriftung <- paste(krankheitsstand, prozent, "%", sep = " ")
+pcg <- pie(prozent, main = "gute Cholesterolwerte",labels = beschriftung , col = c("green" , "red"))
+
+
+# Danach die Patienten mit mittelguten Cholwerten
+
+tcm <- table(m_cholwerte$cardio)
+tcm <- (tcm/sum(tcm))*100
+
+prozent <- round(tcm)
+
+krankheitsstand <- c("gesund","krank")
+
+beschriftung <- paste(krankheitsstand, prozent, "%", sep = " ")
+pcm <- pie(prozent, main = "mittelgute Cholesterolwerte",labels = beschriftung , col = c("green" , "red"))
+
+
+#Schließlich die Patienten mit schlechten Cholwerten
+
+tcs <- table(s_cholwerte$cardio)
+tcs <- (tcs/sum(tcs))*100
+
+prozent <- round(tcs)
+
+krankheitsstand <- c("gesund","krank")
+
+beschriftung <- paste(krankheitsstand, prozent, "%", sep = " ")
+pcs <- pie(prozent, main = "schlechte Cholesterolwerte",labels = beschriftung , col = c("green" , "red"))
+
+```
+
+Für die Variable $gluc$:
+
+```{r, echo = FALSE}
+par(mfrow = c(1,3))
+#Zuerst die Patienten mit guten Glucwerten
+tgg <- table(g_glucwerte$cardio)
+tgg <- (tgg/sum(tgg))*100
+
+prozent <- round(tgg)
+
+krankheitsstand <- c("gesund","krank")
+
+beschriftung <- paste(krankheitsstand, prozent, "%", sep = " ")
+pgg <- pie(prozent, main = "gute Glucosewerte",labels = beschriftung , col = c("green" , "red"))
+
+
+#Danach die Patienten mit mittelguten Glucwerten
+tgm <- table(m_glucwerte$cardio)
+tgm <- (tgm/sum(tgm))*100
+
+prozent <- round(tgm)
+
+krankheitsstand <- c("gesund","krank")
+
+beschriftung <- paste(krankheitsstand, prozent, "%", sep = " ")
+pgm <- pie(prozent, main = "mittelgute Glucosewerte",labels = beschriftung , col = c("green" , "red"))
+
+
+#Schließlich die Patienten mit schlechten Glucwerten
+tgs <- table(s_glucwerte$cardio)
+tgs <- (tgs/sum(tgs))*100
+
+prozent <- round(tgs)
+
+krankheitsstand <- c("gesund","krank")
+
+beschriftung <- paste(krankheitsstand, prozent, "%", sep = " ")
+pgs <- pie(prozent, main = "schlechte Glucosewerte",labels = beschriftung , col = c("green" , "red"))
+
+
+```
+
+Klar erkennbar ist, dass in beiden Fällen der Anteil an kranken Patient:innen steigt, umso schlechter der Blutwert ist. Es lässt sich also vermuten, dass eine große Korrelation zwischen den Variablen $gluc$ und $cholesterol$ einerseits, und $cardio$ andererseits vorhanden ist. 
+
+\newpage
+
+### Schließlich wird der Lebensstil der Patient:innen untersucht:
+
+Wir definieren dazu:\newline
+
+gute Gesundheit:\newline
+-BMI 18 bis 25 \newline
+-ap_lo < 90 \newline
+-ap_hi < 140 \newline
+
+schlechte Gesundheit: \newline
+- BMI > 25 oder BMI < 18 (über- und untergewicht) \newline
+- ap_lo > 90 \newline
+- ap_hi > 140 \newline
+
+```{r, echo=FALSE, message=FALSE}
+df_1$id <- NULL
+df_gut<-df_1 %>% filter(BMI >= 18) %>% filter(BMI <= 25) %>% filter(ap_lo<=89) %>%filter(ap_hi<=139)
+df_schlecht_1<-df_1 %>% filter(BMI < 18, ap_lo > 89, ap_hi > 139)
+df_schlecht_2<-df_1 %>% filter(BMI > 25, ap_lo > 89, ap_hi > 139)
+df_schlecht <- rbind(df_schlecht_1,df_schlecht_2)
+```
+
+
+```{r, echo=FALSE, out.width="75%"}
+#Glucose gesund
+df_gluc1 <- data.frame(c(1,2,3),c(nrow(filter(df_gut,gluc == 1))/nrow(df_gut),nrow(filter(df_gut,gluc == 2))/nrow(df_gut),nrow(filter(df_gut,gluc == 3))/nrow(df_gut)))
+colnames(df_gluc1) <- c("Glucose","Ratio")
+
+#Cholesterol gesund
+df_chol1 <- data.frame(c(1,2,3),c(nrow(filter(df_gut,cholesterol == 1))/nrow(df_gut),nrow(filter(df_gut,cholesterol == 2))/nrow(df_gut),nrow(filter(df_gut,cholesterol == 3))/nrow(df_gut)))
+colnames(df_chol1) <- c("Cholesterol","Ratio")
+
+#Glucose ungesund
+df_gluc2 <- data.frame(c(1,2,3),c(nrow(filter(df_schlecht,gluc == 1))/nrow(df_schlecht),nrow(filter(df_schlecht,gluc == 2))/nrow(df_schlecht),nrow(filter(df_schlecht,gluc == 3))/nrow(df_schlecht)))
+colnames(df_gluc2) <- c("Glucose","Ratio")
+
+#Cholesterol ungesund
+df_chol2 <- data.frame(c(1,2,3),c(nrow(filter(df_schlecht,cholesterol == 1))/nrow(df_schlecht),nrow(filter(df_schlecht,cholesterol == 2))/nrow(df_schlecht),nrow(filter(df_schlecht,cholesterol == 3))/nrow(df_schlecht)))
+colnames(df_chol2) <- c("Cholesterol","Ratio")
+
+
+
+
+plt1<-ggplot(df_gluc1, aes(x=Glucose, y=Ratio))  + geom_bar(stat = "identity") + ggtitle("Glucose Level bei guter Gesundheit")
+plt2<-ggplot(df_chol1, aes(x=Cholesterol, y=Ratio))  + geom_bar(stat = "identity") + ggtitle("Cholesterol Level bei guter Gesundheit")
+plt3<-ggplot(df_gluc2, aes(x=Glucose, y=Ratio))  + geom_bar(stat = "identity") + ggtitle("Glucose Level bei schlechter Gesundheit")
+plt4<-ggplot(df_chol2, aes(x=Cholesterol, y=Ratio))  + geom_bar(stat = "identity") + ggtitle("Cholesterol Level bei schlechter Gesundheit")
+grid.arrange(plt1,plt2,plt3,plt4, ncol = 2)
+```
+
+Hier stellt sich heraus, dass der Anteil an Patient:innen mit mittelguten und schlechten Blutwerten in der Gruppe der Patient:innen mit schlechter Gesundheit leicht höher ist, als in der Gruppe der Patient:innen mit guter Gesundheit. 
+
+Überraschenderweise stellt sich beim Alkoholkonsum und beim Rauchen nur ein geringfügiger Unterschied heraus: 
+
+```{r, echo=FALSE, out.width="75%"}
+#Alkohol gesund
+df_alc1 <- data.frame(c(0,1),c(nrow(filter(df_gut,alco == 0))/nrow(df_gut),nrow(filter(df_gut,alco == 1))/nrow(df_gut)))
+colnames(df_alc1) <- c("Alkohol","Ratio")
+
+#Rauchen gesund
+df_smoke1 <- data.frame(c(0,1),c(nrow(filter(df_gut,smoke == 0))/nrow(df_gut),nrow(filter(df_gut,smoke == 1))/nrow(df_gut)))
+colnames(df_smoke1) <- c("Rauchen","Ratio")
+
+#Alkohol ungesund
+df_alc2 <- data.frame(c(0,1),c(nrow(filter(df_schlecht,alco == 0))/nrow(df_schlecht),nrow(filter(df_schlecht,alco == 1))/nrow(df_schlecht)))
+colnames(df_alc2) <- c("Alkohol","Ratio")
+
+#Rauchen ungesund
+df_smoke2 <- data.frame(c(0,1),c(nrow(filter(df_schlecht,smoke == 0))/nrow(df_schlecht),nrow(filter(df_schlecht,smoke == 1))/nrow(df_schlecht)))
+colnames(df_smoke2) <- c("Rauchen","Ratio")
+
+
+
+
+plt5<-ggplot(df_alc1, aes(x=Alkohol, y=Ratio))  + geom_bar(stat = "identity") + ggtitle("Alkoholkonsumenten bei guter Gesundheit")
+plt6<-ggplot(df_smoke1, aes(x=Rauchen, y=Ratio))  + geom_bar(stat = "identity") + ggtitle("Raucher bei guter Gesundheit")
+plt7<-ggplot(df_alc2, aes(x=Alkohol, y=Ratio))  + geom_bar(stat = "identity") + ggtitle("Alkoholkonsumenten bei schlechter Gesundheit")
+plt8<-ggplot(df_smoke2, aes(x=Rauchen, y=Ratio))  + geom_bar(stat = "identity") + ggtitle("Raucher bei schlechter Gesundheit")
+grid.arrange(plt5,plt6,plt7,plt8, ncol=2)
+```
+
+
+
+```{r, include=FALSE}
+library(tidyverse)
+library(ggcorrplot)
+library(dplyr)
+library(ggplot2)
+library(gridExtra)
+```
+
+```{r, include=FALSE}
+df_1 <-read.csv("cardio_train.csv", sep=";")
+df_1$age <- df_1$age/365
+df_1$height <- df_1$height/100
+df_1 <- cbind(df_1 , "BMI" = (df_1$weight)/(df_1$height)^2 )
+df_1$height<- NULL
+df_1$weight <- NULL
+
+```
+
+
+```{r, include=FALSE}
+df_1$id <- NULL
+df_gut<-df_1 %>% filter(BMI >= 18) %>% filter(BMI <= 25) %>% filter(ap_lo<=89) %>%filter(ap_hi<=139)
+df_schlecht_1<-df_1 %>% filter(BMI < 18, ap_lo > 89, ap_hi > 139)
+df_schlecht_2<-df_1 %>% filter(BMI > 25, ap_lo > 89, ap_hi > 139)
+df_schlecht <- rbind(df_schlecht_1,df_schlecht_2)
+nrow(df_schlecht)
+```
+
+\newpage
+# 3. Methoden
+In den Abschnitten 3. und 4. der Analyse werden nun statistische Modelle zur exploration versteckter Statistischer Prozesse genutzt. Diese werden im folgenden Vorgestellt.
+
+## Hypothesentest
+
+Wir betrachten das statistische Modell 
+
+
+$\Omega = \{1,\dots,11753\},\ \cal{F} = \cal{P} (\Omega)$,$\ P_\theta = Binomial (11753,\theta)_{\theta \in \Theta}$
+
+
+
+zum Testproblem:  $H_0 : \theta \leq 0.4997 ,\  H_1: \theta > 0.4997$ \newline
+
+Ein gleichmäßig bester Test ist von der Form : $D(x) = 1_{K}(x) \ mit \  K = \{c,\dots,11753\}\ der \ Ablehnungsbereich$ \footnote{Vorlesungsskript}. \newline
+
+Der R-Befehl
+```{r}
+qbinom(0.01, size = 11753, prob = 0.4997, lower.tail = FALSE)
+```
+Damit ist $K = \{5999, ... , 11753\}$ der Ablehnungsbereich des Test zum Signifikanzniveau $1\%$. 
+
+Die Anzahl der Herzkranken in der Gruppe mit schlechter Gesundheit beträgt
+```{r, echo=FALSE}
+sum(df_schlecht$cardio)
+```
+Damit ist die Nullhypothese (bei weitem) verworfen. 
+
+
+
+## Probit Regression 
+
+Aufgrund der vorliegenden Erkenntnisse aus der Explorativen Datenanalyse, erscheint es sinnvoll die versteckte Beziehung zwischen den Variablen genauer zu untersuchen und über eine Regression in linearen Zusammenhang zu der Variable $Cardio$ zu stellen. \newline
+Die binäre Variable $Cardio$ liefert nicht die gewünschte Feinheit, durch welche Änderungen in der abhängigen Größe auf die unabhängigen Einflussvariablen zurückgespielt werden können.
+Ohne Einschränkung der Aussagekraft wird daher statt der $Cardio$ Variable, ihr, von den Einflussvariablen, abhängiger Erwartungswert beschrieben. \newline
+Jedoch besteht für die klassische lineare Regression weiterhin große Fehleranfälligkeit. Zum einen führt der beschriebene Lineare Zusammenhang zu erwarteten Wahrscheinlichkeiten die über $1$ liegen und zum anderen sind aus der Vorlesung bekannte Tests zur Genauigkeit der Regression wenig Aussagekräftig.\newline
+Um das erstere Problem zu umgehen findet die Probit Regression Anwendung.
+Hierbei wird der bedingte Erwartungswert der abhängigen Variable über die Verteilungsfunktion der Normalverteilung berechnet. Die Regression modeliert dabei den $z$-Wert, welcher schließlich über den $qnorm$ Befehl zu der erhaltenen Vorhersage $\Phi(z)$ führt. Die hierfür verwendete Formel lautet \footnote{https://www.econometrics-with-r.org/11.2-palr.html}: \par
+
+\begin{equation*}
+P(Y=1|X_1,X_2,...,X_k)= \Phi(\beta_0+\beta_1*X_1+...+\beta_k*X_k)
+\end{equation*}
+
+für das Modell
+
+\begin{equation*}
+Y= \beta_0+\beta_1*X_1+...+\beta_k*X_k+u
+\end{equation*}
+
+Dabei wird angenommen, dass die bedingten Erwartungswerte Normalverteilt sind. Die Unabhängigkeit der Variablen ist durch die Zufällige Probe der Personen gegeben.
+Die Deutung der berechneten Koeffizienten wird intuitiv wenn man die Veränderung des z-Wertes bei isolierter Veränderung der jeweiligen unabhängigen Variable betrachtet. 
+
+```{r, echo=FALSE}
+glm.model <- glm(cardio ~ age+gender+BMI+ap_hi+ap_lo+cholesterol+gluc+smoke+alco+active,family = binomial(link = "probit"),data=df_1, control = list(maxit = 100))
+
+summary(glm.model)
+```
+
+Die Zusammenfassung der Probit Regression wird mit der Funktion $summary$ erzeugt. Besonders wichtig sind hierzu die werte der jeweiligen Koeffizienten sowie der p-Werte der Hypothesentest entgegen der Nullhypothese “der Koeffizient ist gleich 0”. Dies lässt auf die signifikanz des Koeffizienten schließen.\newline
+Die Visualisierung der Prognosen bezüglich der abhängigen Variabel $BMI$ verdeutlichen die unterschiede welche eine Probit Regression im Vergleich zu einer Linearen Regression haben. 
+
+
+```{r, include=FALSE, out.width="75%"}
+#datasets for prediction tutti
+df_predict <- df_1
+prediction_tot <- predict(glm.model, newdata = df_predict, type="response")
+df_predict$prediction <- prediction_tot 
+df_predict
+
+#datasets for prediction gut
+df_gut_predict <- df_gut
+df_gut_predict$cardio <- NULL
+df_gut_predict$id <- NULL
+
+prediction_gut <- predict(glm.model, newdata = df_gut_predict,type="response")
+df_gut_predict$prediction <- prediction_gut 
+
+
+#datasets for prediction schlecht
+df_schlecht_predict <- df_schlecht
+df_schlecht_predict$cardio <- NULL
+df_schlecht_predict$id <- NULL
+
+prediction_schlecht <- predict(glm.model, newdata = df_schlecht_predict,type="response")
+df_schlecht_predict$prediction <- prediction_schlecht
+
+```
+
+```{r , echo=FALSE, warning=FALSE, message=FALSE, out.width="75%"}
+ggplot(df_predict, aes(x=BMI , y=cardio)) + xlim(0, 100) + geom_point() + geom_smooth(method = 'glm', method.args = list(family = binomial(link = "probit"))) +ggtitle("Probit Model gegeben der Veränderung des BMI") +ylab("Risiko einer kardiovaskulären Erkrankung")
+
+```
+
+                                    
+
+
+## Korrelationspyramide
+
+Die Korrelationspyramide zeigt die jeweiligen Korrelationen der untersuchten Variablen auf. Dabei wird besonderes Augenmerk auf die Korrelation der unabhängigen Variablen mit der abhängigen Variablen gesetzt, da diese die Aussagekraft des Models untermalen. Die berechnung und visualisierung übernimmt hierbei das ggcorrplot package \footnote{“https://cran.r-project.org/web/packages/corrplot/index.html”} welches zur Berechnung der Relevanten Werte auf die Funktion $cor.test$ aus dem Packet $stats$ zurückgreift. Die aufgezeigten Werte gleichen entsprechend dem empirischen Korrelationskoeffizienten \footnote{Definition 6.38 aus dem Vorlesungsskript}. \newline
+Mittels eines p.Test werden die Werte in einem weiteren Plot gegen die Nullhypothese $H.0 := Der \,Korrelationskoeffizient \, ist \,gleich \,0$ getestet. Die Werte die hierbei nicht verworfen werden können, sind dabei mit einem $X$ gekennzeichnet.
+
+```{r, echo=FALSE, out.width="50%"}
+
+corr <- cor(df_1)
+p.mat <- cor_pmat(df_1)
+
+ggcorrplot(corr, hc.order = TRUE, type="lower", p.mat=p.mat)
+```
+```{r, echo=FALSE, out.width="50%"}
+ggcorrplot(corr, hc.order = TRUE, type="lower", lab=TRUE)
+```
+
+
+
+
+
+
+```{r , echo=FALSE}
+# Compare prediction and real values
+
+mean_tut <- mean(df_1$cardio)
+mean_gut <- mean(df_gut$cardio)
+mean_schlecht <- mean(df_schlecht$cardio)
+mean_pred_tut <- mean(df_predict$prediction)
+mean_pred_gut <- mean(df_gut_predict$prediction)
+mean_pred_schlecht <- mean(df_schlecht_predict$prediction)
+
+```
+
+Die folgende Tabelle veranschaulicht die Abweichung der Prognose von den reellen Daten. Aus der Vorlesung ist bekannt, dass der empirische Mittelwert annähernd Normalverteilt ist, entsprechend läuft der Vergleich nach dem Prinzip des mittleren quadratischen Fehlers mit $n=1$.  \newline
+Es wird ersichtlich, dass das Model die Daten gut erklärt. Lediglich bei der Anwendung des Models auf die Gruppe mit Guter Gesundheit prognostiziert das Model ein grundsätzlich höheres Risiko. 
+
+
+```{r , echo=FALSE}
+Abweichung <- function(x,y){
+  z=(abs(y-x)/x)*100
+  return(z)
+}
+
+compare_df <- data.frame(c("Total","Gut","Schlecht"), c(mean_tut, mean_gut, mean_schlecht),c(mean_pred_tut, mean_pred_gut, mean_pred_schlecht), c(Abweichung(mean_tut,mean_pred_tut),Abweichung(mean_gut,mean_pred_gut),Abweichung(mean_schlecht,mean_pred_schlecht)))
+colnames(compare_df) <- c("Betrachtete Gruppe", "Wahrer Median", "Model Median", "Prozentuale Abweichung")
+
+compare_df
+```
+
+\newpage
+
+# 4. Ergebnisse und Schlussfolgerung
+
+Die $p$-Werte liefern, wie bereits erwähnt, eine Aussage bezüglich der Signifikanz der berechneten $\beta$-Koeffizienten. Intuitiv folgt daraus, dass eine Veränderung in der unabhängigen Variable über die betrachtete unabhängige Variable erklärt werden kann. \newline
+Aus der summary des Models wird sofort ersichtlich, dass jede der gelisteten Variable signifikant zu einem Nivea sind welches kleiner als $\alpha = 0,1\%$ ist. Es lässt sich also schließen, dass zu jeder abhängigen Variable, die Bewegung zur Veränderung des $z$-Wertes führt. \newline
+Ähnliches lässt sich auch von der Korrelationspyramide ableiten. Hier weist keine Variable eine insignifikante korrelation mit der unabhängigen Variable auf. Auffallend ist dabei, dass die Variablen: $BMI$ und $Cholesterol$ am stärksten mit $Cardio$ korrelieren. Interessant ist auch, dass das Geschlecht ebenfalls einen Einfluss auf das Risiko hat an kardiovaskulären Krankheiten zu erleiden. Dies deckt sich mit der Datenanalyse aus Teil 2 (überprüfen). \par
+
+```{r , echo=FALSE}
+summary(glm.model)$coefficients
+```
+
+
+Um Aussagen über die Genauigkeit des Tests treffen zu können, werden die Erkentnisse der explorativen Datenanalyse genommen und mit den Charakteristiken der geschätzten Werte verglichen.\newline 
+Die Histogramme wurden entsprechen der geschilderten Gruppenaufteilung des Datensets angefertigt und darüber eine ideale Normalverteilung (in blau) gelegt, mit jeweiliger verschiedener Varianzen und Erwartungswerten. Es lässt sich deutlich erkennen, dass die Personen mit schlechter Gesundheit ein höheres Risiko und die mit guter Gesundheit ein niedrigere Risiko aufweisen, zu erkranken. Auch interessant ist, dass eine höhere Menge an Personen in unserem Gesamt Datenset ein niedrigeres Risiko aufweisen. Der Erwartungswert liegt bei  $\sim50\%$.
+
+```{r , echo=FALSE, out.width="50%"}
+x<-df_predict$prediction
+z <- df_gut_predict$prediction
+b<-df_schlecht_predict$prediction
+h.x<-hist(x, main="Verteilung der Gesamtgruppe", xlab="Risiko zu erkranken", ylab="Anzahl der Personen", ylim=c(0,8000))
+xfit<-seq(min(x),max(x),length=40)
+
+y.xfit<-dnorm(xfit,mean=mean(x),sd=sd(x))
+y.xfit <- y.xfit*diff(h.x$mids[1:2])*length(x)
+lines(xfit, y.xfit, col="blue", lwd=2)
+h.b<-hist(b, main="Verteilung der Gruppe mit schlechter Gesundheit", xlab="Risiko zu erkranken", ylab="Anzahl der Personen",ylim=c(0,2000))
+bfit <- seq(min(b),max(b),length=40)
+y.bfit<-dnorm(bfit,mean=mean(b),sd=sd(b))
+y.bfit <- y.bfit*diff(h.b$mids[1:2])*length(b)
+lines(bfit, y.bfit, col="blue", lwd=2)
+h.z<-hist(z, main="Verteilung der Gruppe mit guter Gesundheit", xlab="Risiko zu erkranken", ylab="Anzahl der Personen")
+zfit <- seq(min(z),max(z),length=40)
+y.zfit<-dnorm(zfit,mean=mean(z),sd=sd(z))
+y.zfit <- y.zfit*diff(h.z$mids[1:2])*length(z)
+lines(zfit, y.zfit, col="blue", lwd=2)
+
+
+```
+
+
+
+
+
+
+
+
+
+
