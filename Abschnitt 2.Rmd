@@ -28,15 +28,16 @@ df_1 <- cbind(df_1 , "BMI" = (df_1$weight)/(df_1$height)^2 )
 
 ```
 
+# Explorative Datenanalyse
+Der folgende Abschnitt dient zur Einführung in den vorliegenden Datensatz. Dabei wird dem Leser ein grober Überblick der Gesamtstruktur des Datensatzes gegeben und im späteren Verlauf genauere Charakteristiken bezüglich der Variablen die in der späteren Analyse noch von größerer Bedeutung sind.
 
   
-### Übersicht des Datensatzes und Struktur: 
-
-
+## Übersicht des Datensatzes und Struktur
 
 ```{r, echo = FALSE}
 summary(object = df_1)
 ```
+
 mit der Struktur
 
 ```{r, echo = FALSE}
@@ -44,6 +45,7 @@ str(df_1)
 ```
 
 Zuerst untersuchen wir, ob unser Datensatz lückenhaft ist
+
 ```{r}
 
 number_of_columns <- ncol(df_1)
@@ -73,7 +75,7 @@ b2 <- boxplot(df_1$height, main = "Größeverteilung", ylab = "Größe")
 Es handelt sich also um Durchschnittlich 53 jährige, überwiegend weibliche Patient:innen.
 Dies erklärt auch, weshalb die mittlere Größe "nur" 1,64m ist. 
 
-### Nun ein Überblick vom Gesundheitsstand der Patient:innen. 
+## Nun ein Überblick vom Gesundheitsstand der Patient:innen
 
 
 ```{r, echo = FALSE}
@@ -89,9 +91,9 @@ pie(prozent, main = "Kranksheitszustand der Patient:innen",labels = beschriftung
 
 ```
 
-Es gibt in unserem Datensatz also fast genauso viele kranke, als gesunde Patienten.
+Es gibt in unserem Datensatz also fast genauso viele kranke, wie gesunde Patienten.
 
-#### Untersuchung der Blutwerte ergibt:
+### Untersuchung der Blutwerte ergibt
 
 ```{r, echo = FALSE}
 
@@ -102,7 +104,7 @@ ggarrange(p1,p2,ncol = 1)
 ```
 
 Man erkennt an dem Plot, dass die Mehrheit der Patient:innen - sowohl die männlichen
-als auch weiblichen - gute Glucose- und Cholesterolwerte hat. 
+als auch weiblichen - gute Glucose- und Cholesterolwerte hat.\newline 
 Einen genaueren Einblick lieferen beide folgenden Plots.
 
 ```{r, echo=FALSE}
@@ -140,7 +142,7 @@ plot<- df_1%>%
 ggplot(plot, aes(y =n, x = as.factor(cholesterol)))+ geom_bar(stat='identity', aes(fill = as.factor(cholesterol)))+ facet_wrap(facets = plot$agegroups, scales="free_y")+xlab("Cholesterolwerte") + ylab ("Anzahl") + labs(title="Cholesterollevel für die Altersgruppe")+ scale_fill_discrete(name = "gluc", labels = as.factor(c("gute", "mittelgute", "schlechte")))
 ```
 
-Hier erkennt man ganz klar, dass die Blutwertqualität mit dem alter abnimmt. Je älter die Patient:innen, umso größer ist der Anteil an Patient:innen mit mittelguten und schlechten Glucose bzw. Cholesterolwerten.
+Hier erkennt man ganz klar, dass die Blutwertqualität mit dem alter abnimmt. Je älter die Patient:innen, umso größer ist der Anteil an Patient:innen mit mittelguten und schlechten Glucose bzw. Cholesterolwerten. \newline
 
 Dies gibt uns Anlass zur explorativen Suche nach Einflussvariablen für das Auftreten von kardiovaskulären Krankheiten. 
 
@@ -175,9 +177,9 @@ BMI-Mittelwert der kranken Patient:innen:
 summary(df_krank$BMI)
 ```
 
-Man sieht anhand des Plot und der Tabellen, dass die kranken Patienten nur einen leicht höheren BMI vorweisen, als die gesunden. Entsprechend 26.483 und 28.473 im Mittel. Vermutlich hat die Variable BMI keinen erheblichen Einfluss, da sich hier keinen klaren Trend ablesen lässt. Genaueres wird im Abschnitt 3 und 4 untersucht. Jedoch gilt ein:e Patient:in ab einem BMI von 25 als übergewichtig, also haben sowohl die gesunden als auch die kranken Patient:innen einen zu hohen BMI. 
+Man sieht anhand des Plot und der Tabellen, dass die kranken Patienten nur einen leicht höheren BMI vorweisen, als die gesunden. Entsprechend 26.483 und 28.473 im Mittel. Vermutlich hat die Variable $BMI$ keinen erheblichen Einfluss, da sich hier keinen klaren Trend ablesen lässt. Genaueres wird im Abschnitt 3 und 4 untersucht. Jedoch gilt ein:e Patient:in ab einem BMI von 25 als übergewichtig, also haben sowohl die gesunden als auch die kranken Patient:innen einen zu hohen BMI. \newline
 
-Untersuchung der Blutdruckwerte: 
+Untersuchung der Blutdruckwerte: \newline
 
 Wir definieren:\newline
 \newline
@@ -205,10 +207,10 @@ s_blutdruck <- filter(df_1_plot, ap_hi >= 140 | ap_lo >=  90)
 mean(s_blutdruck$cardio)
 ```
 
-Im Plot befindet sich innerhalb des Quadrats die Gruppe an Patienten:innen, die gute Blutdruckwerte haben und außerhalb des Quadrats die, der Patient:innen mit schlechten Blutdruckwerten. Graphisch erkennt man, dass sich innerhalb des Quadrats eher mehr grüne Punkte befinden als rote; und außerhalb des Quadrats andersherum - was durch die Krankheitsraten in den jeweiligen Gruppen bestätigt wird. 
+Im Plot befindet sich innerhalb des Quadrats die Gruppe an Patienten:innen, die gute Blutdruckwerte haben und außerhalb des Quadrats die, der Patient:innen mit schlechten Blutdruckwerten. Graphisch erkennt man, dass sich innerhalb des Quadrats eher mehr grüne Punkte befinden als rote; und außerhalb des Quadrats andersherum - was durch die Krankheitsraten in den jeweiligen Gruppen bestätigt wird. \newline
 
 
-Im folgenden haben wir die Patient:innen, für die Variablen cholesterol und gluc, in drei Gruppen je nach Blutwerten aufgeteilt und jeweils den Anteil an kranken und gesunden Patient:innen untersucht.
+Im folgenden haben wir die Patient:innen, für die Variablen $cholesterol$ und $gluc$, in drei Gruppen je nach Blutwerten aufgeteilt und jeweils den Anteil an kranken und gesunden Patient:innen untersucht.
 
 ```{r, echo = FALSE , message=FALSE}
 gesunde <- filter(df_1, cardio == 0)
@@ -224,7 +226,7 @@ s_glucwerte <- filter(df_1 , gluc == 3)
 
 ```
 
-Für die Variable cholesterol:
+Für die Variable $cholesterol$:
 
 ```{r, echo = FALSE}
 par(mfrow = c(1,3))
@@ -267,7 +269,7 @@ pcs <- pie(prozent, main = "schlechte Cholesterolwerte",labels = beschriftung , 
 
 ```
 
-Für die Variable gluc:
+Für die Variable $gluc$:
 
 ```{r, echo = FALSE}
 par(mfrow = c(1,3))
@@ -309,11 +311,11 @@ pgs <- pie(prozent, main = "schlechte Glucosewerte",labels = beschriftung , col 
 
 ```
 
-Klar erkennbar ist, dass in beiden Fällen der Anteil an kranken Patient:innen steigt, umso schlechter der Blutwert ist. Es lässt sich also vermuten, dass eine große Korrelation zwischen den Variablen gluc und cholesterol einerseits, und cardio andererseits vorhanden ist. 
+Klar erkennbar ist, dass in beiden Fällen der Anteil an kranken Patient:innen steigt, umso schlechter der Blutwert ist. Es lässt sich also vermuten, dass eine große Korrelation zwischen den Variablen $gluc$ und $cholesterol$ einerseits, und $cardio$ andererseits vorhanden ist. 
 
 ### Schließlich wird der Lebensstil der Patient:innen untersucht:
 
-Wir definieren dazu:
+Wir definieren dazu:\newline
 
 gute Gesundheit:\newline
 -BMI 18 bis 25 \neline
@@ -363,7 +365,8 @@ grid.arrange(plt1,plt2,plt3,plt4, ncol = 2)
 
 Hier stellt sich heraus, dass der Anteil an Patient:innen mit mittelguten und schlechten Blutwerten in der Gruppe der Patient:innen mit schlechter Gesundheit leicht höher ist, als in der Gruppe der Patient:innen mit guter Gesundheit. 
 
-Jedoch stellt sich beim Alkoholkonsum und beim Rauchen nur ein geringfügiger Unterschied heraus: 
+Überraschenderweise stellt sich beim Alkoholkonsum und beim Rauchen nur ein geringfügiger Unterschied heraus: 
+
 ```{r, echo=FALSE}
 #Alkohol gesund
 df_alc1 <- data.frame(c(0,1),c(nrow(filter(df_gut,alco == 0))/nrow(df_gut),nrow(filter(df_gut,alco == 1))/nrow(df_gut)))

@@ -3,7 +3,7 @@ title: "Abschnitt 4"
 output: pdf_document
 ---
 
-#Teil 4 Auswertung der Ergebnisse: Auswertung der Regression
+# 4.Ergebnisse und Schlussfolgerung
 
 Die $p$-Werte liefern, wie bereits erwähnt, eine Aussage bezüglich der Signifikanz der berechneten $\beta$-Koeffizienten. Intuitiv folgt daraus, dass eine Veränderung in der unabhängigen Variable über die betrachtete unabhängige Variable erklärt werden kann. \newline
 Aus der summary des Models wird sofort ersichtlich, dass jede der gelisteten Variable signifikant zu einem Nivea sind welches kleiner als $\alpha = 0,1\%$ ist. Es lässt sich also schließen, dass zu jeder abhängigen Variable, die Bewegung zur Veränderung des $z$-Wertes führt. \newline
@@ -14,7 +14,7 @@ summary(glm.model)$coefficients
 ```
 
 
-Um Aussagen über die Genauigkeit des Tests treffen zu können, werden die Erkentnisse der explorativen Datenanalyse genommen und mit den Charakteristiken der geschätzten Werte verglichen. 
+Um Aussagen über die Genauigkeit des Tests treffen zu können, werden die Erkentnisse der explorativen Datenanalyse genommen und mit den Charakteristiken der geschätzten Werte verglichen.\newline 
 Die Histogramme wurden entsprechen der geschilderten Gruppenaufteilung des Datensets angefertigt und darüber eine ideale Normalverteilung (in blau) gelegt, mit jeweiliger verschiedener Varianzen und Erwartungswerten. Es lässt sich deutlich erkennen, dass die Personen mit schlechter Gesundheit ein höheres Risiko und die mit guter Gesundheit ein niedrigere Risiko aufweisen, zu erkranken. Auch interessant ist, dass eine höhere Menge an Personen in unserem Gesamt Datenset ein niedrigeres Risiko aufweisen. Der Erwartungswert liegt bei  $\sim50\%$.
 
 ```{r , echo=FALSE}

@@ -17,7 +17,6 @@ df_1$height <- df_1$height/100
 df_1 <- cbind(df_1 , "BMI" = (df_1$weight)/(df_1$height)^2 )
 df_1$height<- NULL
 df_1$weight <- NULL
-head(df_1)
 ```
 
 
@@ -28,17 +27,20 @@ df_schlecht_1<-df_1 %>% filter(BMI < 18, ap_lo > 89, ap_hi > 139)
 df_schlecht_2<-df_1 %>% filter(BMI > 25, ap_lo > 89, ap_hi > 139)
 df_schlecht <- rbind(df_schlecht_1,df_schlecht_2)
 ```
+# 3. Methoden
+In den Abschnitten 3. und 4. der Analyse werden nun statistische Modelle zur exploration versteckter Statistischer Prozesse genutzt. Diese werden im folgenden Vorgestellt.
 
+## Hypothesentest
 
-Wir betrachten das statistische Modell
+Wir betrachten das statistische Modell \newline
 
-$(\Omega = \{1,\dots,2831\},\ \cal{F} = \cal{P}(\Omega),\ (P_\theta = Binomial(2831,\theta))_{\theta\in\Theta})$
+$(\Omega = \{1,\dots,2831\},\ \cal{F} = \cal{P}(\Omega),\ (P_\theta = Binomial(2831,\theta))_{\theta\in\Theta})$ \newline
 
-zum Testproblem:  $H_0 : \theta \leq 0.4997 ,\  H_1: \theta > 0.4997$
+zum Testproblem:  $H_0 : \theta \leq 0.4997 ,\  H_1: \theta > 0.4997$ \newline
 
-Ein gleichmäßig bester Test ist nach der Vorlesung der Form : $D(x) = 1_{K}(x) \ mit \  K = \{c,\dots,2831\}\ der \ Ablehnungsbereich. $
+Ein gleichmäßig bester Test ist von der Form : $D(x) = 1_{K}(x) \ mit \  K = \{c,\dots,2831\}\ der \ Ablehnungsbereich. $\footnote{Vorlesungsskript} \Newline
 
-Der R-Befehl 
+Der R-Befehl
 ```{r}
 qbinom(0.01, size = 2831, prob = 0.4997, lower.tail = FALSE)
 ```
@@ -52,7 +54,7 @@ Damit ist die Nullhypothese (bei weitem) verworfen.
 
 
 
-#Teil 3 Methoden: Probit Regression 
+## Probit Regression 
 
 Aufgrund der vorliegenden Erkenntnisse aus der Explorativen Datenanalyse, erscheint es sinnvoll die versteckte Beziehung zwischen den Variablen genauer zu untersuchen und über eine Regression in linearen Zusammenhang zu der Variable $Cardio$ zu stellen. \newline
 Die binäre Variable $Cardio$ liefert nicht die gewünschte Feinheit, durch welche Änderungen in der abhängigen Größe auf die unabhängigen Einflussvariablen zurückgespielt werden können.
@@ -80,9 +82,9 @@ glm.model <- glm(cardio ~ age+gender+BMI+ap_hi+ap_lo+cholesterol+gluc+smoke+alco
 summary(glm.model)
 ```
 
-Die folgende Zusammenfassung der Probit Regression wird mit der Funktion $summary$ erzeugt. Besonders wichtig sind hierzu die werte der jeweiligen Koeffizienten sowie der p-Werte der Hypothesentest entgegen der Nullhypothese “der Koeffizient ist gleich 0”. Dies lässt auf die signifikanz des Koeffizienten schließen.\newline
+Die Zusammenfassung der Probit Regression wird mit der Funktion $summary$ erzeugt. Besonders wichtig sind hierzu die werte der jeweiligen Koeffizienten sowie der p-Werte der Hypothesentest entgegen der Nullhypothese “der Koeffizient ist gleich 0”. Dies lässt auf die signifikanz des Koeffizienten schließen.\newline
+Die Visualisierung der Prognosen bezüglich der abhängigen Variabel $BMI$ verdeutlichen die unterschiede welche eine Probit Regression im Vergleich zu einer Linearen Regression haben. 
 
-# Plot der Predictions mit Realen daten (Visualiesierung der Prognosed daten)
 
 ```{r, include=FALSE}
 #datasets for prediction tutti
@@ -115,12 +117,12 @@ ggplot(df_predict, aes(x=BMI , y=cardio)) + xlim(0, 100) + geom_point() + geom_s
 
 ```
 
-Die Visualisierung der Prognosen bezüglich der abhängigen Variabel $BMI$ verdeutlichen die unterschiede welche eine Probit Regression im Vergleich zu einer Linearen Regression haben.                                     
+                                    
 
 
-#Methoden: Korrelationspyramide
+## Korrelationspyramide
 
-Die folgende Korrelationspyramide zeigt die jeweiligen Korrelationen der untersuchten Variablen auf. Dabei wird besonderes Augenmerk auf die Korrelation der unabhängigen Variablen mit der abhängigen Variablen gesetzt, da diese die Aussagekraft des Models untermalen. Die berechnung und visualisierung übernimmt hierbei das ggcorrplot package \footnote{“https://cran.r-project.org/web/packages/corrplot/index.html”} welches zur Berechnung der Relevanten Werte auf die Funktion $cor.test$ aus dem Packet $stats$ zurückgreift. Die aufgezeigten Werte gleichen entsprechend dem empirischen Korrelationskoeffizienten \footnote{Definition 6.38 aus dem Vorlesungsskript}.
+Die Korrelationspyramide zeigt die jeweiligen Korrelationen der untersuchten Variablen auf. Dabei wird besonderes Augenmerk auf die Korrelation der unabhängigen Variablen mit der abhängigen Variablen gesetzt, da diese die Aussagekraft des Models untermalen. Die berechnung und visualisierung übernimmt hierbei das ggcorrplot package \footnote{“https://cran.r-project.org/web/packages/corrplot/index.html”} welches zur Berechnung der Relevanten Werte auf die Funktion $cor.test$ aus dem Packet $stats$ zurückgreift. Die aufgezeigten Werte gleichen entsprechend dem empirischen Korrelationskoeffizienten \footnote{Definition 6.38 aus dem Vorlesungsskript}. \newline
 Mittels eines p.Test werden die Werte in einem weiteren Plot gegen die Nullhypothese $H.0 := Der \,Korrelationskoeffizient \, ist \,gleich \,0$ getestet. Die Werte die hierbei nicht verworfen werden können, sind dabei mit einem $X$ gekennzeichnet.
 
 ```{r, echo=FALSE}
