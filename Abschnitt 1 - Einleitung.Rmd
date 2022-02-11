@@ -513,11 +513,14 @@ In den Abschnitten 3. und 4. der Analyse werden nun statistische Modelle zur exp
 
 Wir betrachten das statistische Modell \par
 
-$(\Omega = \{1,\dots,11753\},\ \cal{F} = \cal{P}(\Omega),\ (P_\theta = Binomial(2831,\theta))_{\theta\in\Theta})$ \newline
+\begin{equation*}
+(\Omega = \{1,\dots,11753\},\ \cal{F} = \cal{P}(\Omega),\ (P_\theta = Binomial(11753,\theta))_{\theta\in\Theta})
+\end{equation*}
+
 
 zum Testproblem:  $H_0 : \theta \leq 0.4997 ,\  H_1: \theta > 0.4997$ \newline
 
-Ein gleichmäßig bester Test ist von der Form : $D(x) = 1_{K}(x) \ mit \  K = \{c,\dots,11753\}\ der \ Ablehnungsbereich.$ \footnote{Vorlesungsskript} \newline
+Ein gleichmäßig bester Test ist von der Form : $D(x) = 1_{K}(x) \ mit \  K = \{c,\dots,11753\}\ der \ Ablehnungsbereich$ \footnote{Vorlesungsskript}. \newline
 
 Der R-Befehl
 ```{r}
@@ -650,7 +653,7 @@ compare_df
 
 \newpage
 
-# 4.Ergebnisse und Schlussfolgerung
+# 4. Ergebnisse und Schlussfolgerung
 
 Die $p$-Werte liefern, wie bereits erwähnt, eine Aussage bezüglich der Signifikanz der berechneten $\beta$-Koeffizienten. Intuitiv folgt daraus, dass eine Veränderung in der unabhängigen Variable über die betrachtete unabhängige Variable erklärt werden kann. \newline
 Aus der summary des Models wird sofort ersichtlich, dass jede der gelisteten Variable signifikant zu einem Nivea sind welches kleiner als $\alpha = 0,1\%$ ist. Es lässt sich also schließen, dass zu jeder abhängigen Variable, die Bewegung zur Veränderung des $z$-Wertes führt. \newline
