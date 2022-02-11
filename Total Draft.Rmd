@@ -120,6 +120,8 @@ mit der Struktur
 str(df_1)
 ```
 
+\newpage
+
 Zuerst untersuchen wir, ob unser Datensatz lückenhaft ist
 
 ```{r}
