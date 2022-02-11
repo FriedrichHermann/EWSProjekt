@@ -1,0 +1,18 @@
+---
+title: "Presi"
+output:
+  beamer_presentation: default
+  ioslides_presentation: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+```{r, echo=FALSE}
+df_1 <-read.csv("cardio_train.csv", sep=";")
+df_1$age <- df_1$age/365
+df_1$height <- df_1$height/100
+df_1 <- cbind(df_1 , "BMI" = (df_1$weight)/(df_1$height)^2 )
+head(df_1)
+```
