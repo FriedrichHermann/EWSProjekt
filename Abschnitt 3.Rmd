@@ -1,6 +1,8 @@
 ---
 title: "Abschnitt 3"
-output: pdf_document
+output:
+  html_document:
+    df_print: paged
 ---
 ```{r, include=FALSE}
 library(tidyverse)
@@ -34,6 +36,20 @@ In den Abschnitten 3. und 4. der Analyse werden nun statistische Modelle zur exp
 
 ## Hypothesentest
 
+Nun wird ein Hypothesentest durchgeführt, um zu untersuchen, ob Patient:innen mit schlechter Gesundheit überdurchschnittlich stark von kardiovaskulären Krankheiten betroffen sind.
+
+Wir definieren eine Gruppe von Patienten, die eine "schlechte Gesundheit" haben:
+
+Die Patienten für die folgendes zutrifft sind teil der Gruppe:
+
+-schlechter Blutdruck (Def von oben)
+-mittelgute und schlechte Glucose- und Cholesterolwerte.
+- BMI > 25 und BMI < 18
+
+Durchschnittlich erleiden 49.97 % der Patienten in unserem Datensatz an einer kardiovasculären Krankheit.
+
+
+ 
 Wir betrachten das statistische Modell \newline
 
 $(\Omega = \{1,\dots,11753\},\ \cal{F} = \cal{P}(\Omega),\ (P_\theta = Binomial(2831,\theta))_{\theta\in\Theta})$ \newline
@@ -170,6 +186,8 @@ colnames(compare_df) <- c("Betrachtete Gruppe", "Wahrer Median", "Model Median",
 
 compare_df
 ```
+
+
 
 
 
