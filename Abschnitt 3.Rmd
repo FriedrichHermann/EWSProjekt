@@ -17,6 +17,7 @@ df_1$height <- df_1$height/100
 df_1 <- cbind(df_1 , "BMI" = (df_1$weight)/(df_1$height)^2 )
 df_1$height<- NULL
 df_1$weight <- NULL
+
 ```
 
 
@@ -26,6 +27,7 @@ df_gut<-df_1 %>% filter(BMI >= 18) %>% filter(BMI <= 25) %>% filter(ap_lo<=89) %
 df_schlecht_1<-df_1 %>% filter(BMI < 18, ap_lo > 89, ap_hi > 139)
 df_schlecht_2<-df_1 %>% filter(BMI > 25, ap_lo > 89, ap_hi > 139)
 df_schlecht <- rbind(df_schlecht_1,df_schlecht_2)
+nrow(df_schlecht)
 ```
 # 3. Methoden
 In den Abschnitten 3. und 4. der Analyse werden nun statistische Modelle zur exploration versteckter Statistischer Prozesse genutzt. Diese werden im folgenden Vorgestellt.
@@ -34,21 +36,21 @@ In den Abschnitten 3. und 4. der Analyse werden nun statistische Modelle zur exp
 
 Wir betrachten das statistische Modell \newline
 
-$(\Omega = \{1,\dots,2831\},\ \cal{F} = \cal{P}(\Omega),\ (P_\theta = Binomial(2831,\theta))_{\theta\in\Theta})$ \newline
+$(\Omega = \{1,\dots,11753\},\ \cal{F} = \cal{P}(\Omega),\ (P_\theta = Binomial(2831,\theta))_{\theta\in\Theta})$ \newline
 
 zum Testproblem:  $H_0 : \theta \leq 0.4997 ,\  H_1: \theta > 0.4997$ \newline
 
-Ein gleichmäßig bester Test ist von der Form : $D(x) = 1_{K}(x) \ mit \  K = \{c,\dots,2831\}\ der \ Ablehnungsbereich. $\footnote{Vorlesungsskript} \Newline
+Ein gleichmäßig bester Test ist von der Form : $D(x) = 1_{K}(x) \ mit \  K = \{c,\dots,11753\}\ der \ Ablehnungsbereich. $\footnote{Vorlesungsskript} \Newline
 
 Der R-Befehl
 ```{r}
-qbinom(0.01, size = 2831, prob = 0.4997, lower.tail = FALSE)
+qbinom(0.01, size = 11753, prob = 0.4997, lower.tail = FALSE)
 ```
-Damit ist $K = \{1477, ... , 2831\}$ der Ablehnungsbereich des Test zum Signifikanzniveau $1\%$. 
+Damit ist $K = \{5999, ... , 11753\}$ der Ablehnungsbereich des Test zum Signifikanzniveau $1\%$. 
 
 Wir haben
 ```{r}
-sum(ungesund$cardio)
+sum(df_schlecht$cardio)
 ```
 Damit ist die Nullhypothese (bei weitem) verworfen. 
 
